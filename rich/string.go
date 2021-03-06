@@ -22,28 +22,6 @@ func NewRichString(str string, style *Style) RichString {
 	return richRunes
 }
 
-// Linked list type used internally
-type stringList struct {
-	value RichString
-	next  *stringList
-}
-
-func (l *stringList) length() int {
-	if l.next == nil {
-		return 1
-	}
-	return l.next.length() + 1
-}
-
-func (l *stringList) toSlice() []RichString {
-	result := make([]RichString, l.length())
-	for i := range result {
-		result[i] = l.value
-		l = l.next
-	}
-	return result
-}
-
 // Check if s is a prefix of r ignoring formatting
 func (r RichString) HasStringPrefix(s string) bool {
 	// Prefix can't be longer than the string itself
@@ -73,35 +51,6 @@ func (r RichString) EqualsString(s string) bool {
 	return len(s) == len(r) && r.HasStringPrefix(s)
 }
 
-// Helper that splits the string into a linked list
-func (r RichString) listSplit(delim string) *stringList {
-	head := &stringList{} // empty head avoids special casing
-	current := head
-OUTER:
-	for {
-		for i := range r {
-			if r[i:].HasStringPrefix(delim) {
-				current.next = &stringList{
-					// Value is everything up until the delimiter
-					value: r[:i],
-				}
-				current = current.next
-
-				r = r[i+len(delim):]
-				continue OUTER
-			}
-		}
-
-		// If we made it out of the loop, there was no delimiter, so we just return
-		// the entire string (this will always happen for the last substring)
-		current.next = &stringList{value: r}
-		break
-	}
-
-	// Chop off empty head
-	return head.next
-}
-
 func (r RichString) splitRunes() []RichString {
 	result := make([]RichString, len(r))
 	for i := range r {
@@ -118,7 +67,25 @@ func (r RichString) Split(delim string) []RichString {
 		// strings
 		return r.splitRunes()
 	}
-	return r.listSplit(delim).toSlice()
+	result := make([]RichString, 0, 1)
+
+OUTER:
+	for {
+		for i := range r {
+			if r[i:].HasStringPrefix(delim) {
+				result = append(result, r[:i])
+				r = r[i+len(delim):]
+				continue OUTER
+			}
+		}
+
+		// If we made it out of the loop, there was no delimiter, so we just return
+		// the entire string (this will always happen for the last substring)
+		result = append(result, r)
+		break
+	}
+
+	return result
 }
 
 // Concatenate strings into a new string.
