@@ -59,6 +59,22 @@ func (r RichString) splitRunes() []RichString {
 	return result
 }
 
+// Split one string off of the delimiter and put it into the accumulator, then
+// return the remainder
+func (r RichString) splitFirst(delim string, accum *[]RichString) RichString {
+	for i := range r {
+		if r[i:].HasStringPrefix(delim) {
+			*accum = append(*accum, r[:i])
+			return r[i+len(delim):]
+		}
+	}
+
+	// If we made it out of the loop, there was no delimiter, so we just return
+	// the entire string (this will always happen for the last substring)
+	*accum = append(*accum, r)
+	return nil
+}
+
 // Similar to strings.Split. Note that the result will be a reslicing of the
 // original string, not a copy.
 func (r RichString) Split(delim string) []RichString {
@@ -69,22 +85,9 @@ func (r RichString) Split(delim string) []RichString {
 	}
 	result := make([]RichString, 0, 1)
 
-OUTER:
-	for {
-		for i := range r {
-			if r[i:].HasStringPrefix(delim) {
-				result = append(result, r[:i])
-				r = r[i+len(delim):]
-				continue OUTER
-			}
-		}
-
-		// If we made it out of the loop, there was no delimiter, so we just return
-		// the entire string (this will always happen for the last substring)
-		result = append(result, r)
-		break
+	for r != nil {
+		r = r.splitFirst(delim, &result)
 	}
-
 	return result
 }
 
