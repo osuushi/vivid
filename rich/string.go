@@ -73,23 +73,33 @@ func (r RichString) EqualsString(s string) bool {
 	return len(s) == len(r) && r.HasStringPrefix(s)
 }
 
-// Helper that splits the string recursively by creating a linked list
+// Helper that splits the string into a linked list
 func (r RichString) listSplit(delim string) *stringList {
-	for i := range r {
-		if r[i:].HasStringPrefix(delim) {
-			return &stringList{
-				// Value is everything up until the delimiter
-				value: r[:i],
-				next:  r[i+len(delim):].listSplit(delim),
+	head := &stringList{} // empty head avoids special casing
+	current := head
+OUTER:
+	for {
+		for i := range r {
+			if r[i:].HasStringPrefix(delim) {
+				current.next = &stringList{
+					// Value is everything up until the delimiter
+					value: r[:i],
+				}
+				current = current.next
+
+				r = r[i+len(delim):]
+				continue OUTER
 			}
 		}
+
+		// If we made it out of the loop, there was no delimiter, so we just return
+		// the entire string (this will always happen for the last substring)
+		current.next = &stringList{value: r}
+		break
 	}
-	// If we made it out of the loop, there was no delimiter, so we just return
-	// the entire string (this will always happen for the last substring)
-	return &stringList{
-		value: r,
-		next:  nil,
-	}
+
+	// Chop off empty head
+	return head.next
 }
 
 func (r RichString) splitRunes() []RichString {
