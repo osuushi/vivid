@@ -3,6 +3,9 @@
 package vivian
 }
 
+Root <- content:Content EOF {
+  return content, nil
+}
 
 Content <- tags:Tag+ OpenBrace children:(Content / Input / Text )* CloseBrace {
 	return &ContentNode{
@@ -57,3 +60,4 @@ OpenBrace <- '\x02'
 CloseBrace <- '\x03'
 
 _ "whitespace" ← [ \t\r\n]*
+EOF <- !.

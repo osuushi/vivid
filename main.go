@@ -12,7 +12,7 @@ func main() {
 	str := os.Args[1]
 	ast, err := vivian.ParseString(str)
 	if err != nil {
-		fmt.Printf("Failed with: %v", err)
+		fmt.Printf("Failed with: %v\n", err)
 	} else {
 		pretty.Println(ast)
 	}
