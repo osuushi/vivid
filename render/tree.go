@@ -40,7 +40,7 @@ func isCellCreator(name string) bool {
 	return false
 }
 
-func isCellCreatorNode(node interface{}) bool {
+func isCellCreatorNode(node vivian.Node) bool {
 	contentNode, ok := node.(*vivian.ContentNode)
 	if !ok { // Non-content node never a cell creator
 		return false
@@ -58,16 +58,16 @@ func hoistCells(ast *vivian.Ast) error {
 // Copy a content node, but not its children
 func copyContentNode(node *vivian.ContentNode) *vivian.ContentNode {
 	newStruct := *node
-	newStruct.Children = []interface{}{}
+	newStruct.Children = []vivian.Node{}
 	return &newStruct
 }
 
 // Recursively hoist all content nodes, replacing this node if necessary with
 // new children for the parent.
-func hoistContentNode(node *vivian.ContentNode) ([]interface{}, error) {
+func hoistContentNode(node *vivian.ContentNode) ([]vivian.Node, error) {
 	// If the node is childless, hoisting is a noop
 	if node.Children == nil {
-		return []interface{}{node}, nil
+		return []vivian.Node{node}, nil
 	}
 
 	err := hoistChildren(node)
@@ -83,7 +83,7 @@ func hoistContentNode(node *vivian.ContentNode) ([]interface{}, error) {
 			return nil, err
 		}
 		// We never split a cell creator
-		return []interface{}{node}, nil
+		return []vivian.Node{node}, nil
 	} else {
 		return hoistStyle(node)
 	}
@@ -98,7 +98,7 @@ func hoistChildren(node *vivian.ContentNode) error {
 		return nil
 	}
 
-	newChildren := []interface{}{}
+	newChildren := []vivian.Node{}
 	for _, child := range node.Children {
 		// Recursively hoist child nodes
 		childContentNode, ok := child.(*vivian.ContentNode)
@@ -119,18 +119,14 @@ func hoistChildren(node *vivian.ContentNode) error {
 	return nil
 }
 
-func hoistStyle(node *vivian.ContentNode) ([]interface{}, error) {
+func hoistStyle(node *vivian.ContentNode) ([]vivian.Node, error) {
 	if node.Children == nil {
-		return []interface{}{node}, nil
+		return []vivian.Node{node}, nil
 	}
 
 	anyCellCreators := false
 	for _, child := range node.Children {
-		childContentNode, ok := child.(*vivian.ContentNode)
-		if !ok {
-			continue
-		}
-		if isCellCreator(node.Tag) {
+		if isCellCreatorNode(child) {
 			anyCellCreators = true
 			break
 		}
@@ -140,16 +136,16 @@ func hoistStyle(node *vivian.ContentNode) ([]interface{}, error) {
 	// consecutive lineage. So not finding a cell creator in the children means
 	// that this entire subtree is styling.
 	if !anyCellCreators {
-		return []interface{}{node}, nil
+		return []vivian.Node{node}, nil
 	}
 
 	// The existence of a cell creator child guarantees that this node will be
 	// replaced
-	replacement := []interface{}{}
+	replacement := []vivian.Node{}
 
 	// We use this to coalesce non-creator nodes into one split, so that we don't
 	// split to every child individually.
-	currentRun := []interface{}{}
+	currentRun := []vivian.Node{}
 	appendCoalescedRun := func() {
 		if len(currentRun) == 0 {
 			return
@@ -157,10 +153,10 @@ func hoistStyle(node *vivian.ContentNode) ([]interface{}, error) {
 		clone := copyContentNode(node)
 		clone.Children = currentRun
 		replacement = append(replacement, clone)
-		currentRun = []interface{}{}
+		currentRun = []vivian.Node{}
 	}
 
-	for i, child := range node.Children {
+	for _, child := range node.Children {
 		// Style node has to be injected to the end of the cell creator chain for
 		// cell creators
 		if isCellCreatorNode(child) {
@@ -188,16 +184,17 @@ func injectStyle(styleNode, cellCreator *vivian.ContentNode) {
 			!isCellCreatorNode(cellCreator.Children[0])
 
 	if !endOfLineage {
-		return injectStyle(
+		injectStyle(
 			styleNode,
 			cellCreator.Children[0].(*vivian.ContentNode),
 		)
+		return
 	}
 
 	// Insert style node clone
 	clone := copyContentNode(styleNode)
 	clone.Children = cellCreator.Children
-	cellCreator.Children = []interface{}{clone}
+	cellCreator.Children = []vivian.Node{clone}
 }
 
 // Once descendents are hoisted, a cell creator can have:
@@ -215,7 +212,7 @@ func validateCellCreatorChildren(node *vivian.ContentNode) error {
 
 	// For multiple children, no child may be a cell creator
 	for _, child := range node.Children {
-		if isCellCreator(isCellCreatorNode(node)) {
+		if isCellCreatorNode(node) {
 			return fmt.Errorf(
 				"Sizing element %q cannot be subdivided by %q.\n"+
 					"  May contain exactly one sizing element, OR zero or more style elements.",
