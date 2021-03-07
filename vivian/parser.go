@@ -53,7 +53,7 @@ func ParseString(str string) (*Ast, error) {
 	}
 
 	ast.Content = &ContentNode{
-		Tag:      "root",
+		Tag:      "_root",
 		Children: rootChildren,
 	}
 	transformOutput(ast, ast)
