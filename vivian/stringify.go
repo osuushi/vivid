@@ -2,6 +2,7 @@ package vivian
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -15,8 +16,25 @@ func (ast *Ast) String() string {
 
 	innerStrings := make([]string, len(ast.Content.Children))
 
-	for i, child := range ast.Content.Children {
-		innerStrings[i] = child.String(ast)
+	children := ast.Content.Children
+	for i, child := range children {
+		currentString := child.String(ast)
+		innerStrings[i] = currentString
+		// Check if we need to add a chomp
+		if i > 0 {
+			currentString := innerStrings[i]
+			_, ok := children[i-1].(*InputNode)
+			// If input precedes a string that doesn't start with a space, use a chomp.
+			if ok {
+				matched, err := regexp.MatchString("^\\s", currentString)
+				if err != nil {
+					panic(err)
+				}
+				if !matched {
+					innerStrings[i-1] += "~ "
+				}
+			}
+		}
 	}
 	return header + strings.Join(innerStrings, "")
 }
@@ -35,7 +53,8 @@ func (node *ContentNode) String(root *Ast) string {
 }
 
 func (node *InputNode) String(root *Ast) string {
-	return ""
+	pathString := strings.Join(node.Path, ".")
+	return string(root.TagMarker) + "-" + pathString
 }
 
 func (node *TextNode) String(root *Ast) string {

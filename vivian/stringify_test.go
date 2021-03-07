@@ -30,4 +30,9 @@ func TestStringify(t *testing.T) {
 	check("@${} ")
 	check("My email is ada@@example.com")
 	check("@$()This apple costs $$5.00 (if you can believe it$)")
+	check("@red[@-foo] is the value of @green[foo]")
+	check("Let's see how @-this.chomp~ worked")
+	check("Let's see how @-this.chomp@red[worked]", "Let's see how @-this.chomp~ @red[worked]")
+	check("Let's see how @-this.chomp~ @red[worked]")
+	check("Let's see how @-this.chomp[worked", "Let's see how @-this.chomp~ [worked")
 }
