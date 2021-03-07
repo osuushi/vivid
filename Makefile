@@ -1,7 +1,9 @@
-build: *.peg *.go
+bin/vivid: **/*.go
 	go build -o bin/vivid -v
 
-*.peg:
+build: bin/vivid
+
+vivian/grammar_pigeon.go: vivian/grammar.peg
 	go get -u github.com/mna/pigeon
 	pigeon vivian/grammar.peg | goimports > vivian/grammar_pigeon.go
 
