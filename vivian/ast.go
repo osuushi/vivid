@@ -18,7 +18,7 @@ type ContentNode struct {
 	// Tag names, which are alphanumeric strings. The parser is agnostic to the
 	// actual value of these tags. Validation and parsing of parameterized tags is
 	// left to the consumer.
-	Tags []string
+	Tag string
 
 	// Children can be ContentNodes, TextNodes, or InterpolationNodes
 	Children []interface{}

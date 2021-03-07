@@ -27,13 +27,18 @@ func TestParseString(t *testing.T) {
 	check("foo@@@][", false, &TextNode{Text: "foo@]["})
 
 	check("@foo[]", false, &ContentNode{
-		Tags:     []string{"foo"},
+		Tag:      "foo",
 		Children: nil,
 	})
 
 	check("@foo@bar[]", false, &ContentNode{
-		Tags:     []string{"foo", "bar"},
-		Children: nil,
+		Tag: "foo",
+		Children: []interface{}{
+			&ContentNode{
+				Tag:      "bar",
+				Children: nil,
+			},
+		},
 	})
 
 	check("@-foo.bar.baz", false, &InputNode{
@@ -42,12 +47,12 @@ func TestParseString(t *testing.T) {
 
 	// Swapped tokens
 	check("@{}@foo{}", false, &ContentNode{
-		Tags:     []string{"foo"},
+		Tag:      "foo",
 		Children: nil,
 	})
 
 	check("@#><#foo><", false, &ContentNode{
-		Tags:     []string{"foo"},
+		Tag:      "foo",
 		Children: nil,
 	})
 

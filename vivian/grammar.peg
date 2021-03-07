@@ -12,10 +12,17 @@ Root <- exprList:Expr+ EOF {
 Expr <- Content / Input / Text
 
 Content <- tags:Tag+ OpenBrace children:Expr* CloseBrace {
-	return &ContentNode{
-    Tags: makeStringSlice(tags),
-    Children: children.([]interface{}),
-  }, nil
+  tagNames := makeStringSlice(tags)
+  childNodes := children.([]interface{})
+  var topNode *ContentNode
+  for i := len(tagNames) - 1; i >= 0; i-- {
+    topNode = &ContentNode{
+      Tag: tagNames[i],
+      Children: childNodes,
+    }
+    childNodes = []interface{}{topNode}
+  }
+	return topNode, nil
 } / Tag+ !OpenBrace {
   return nil, fmt.Errorf("Expected open brace for tag. Escape the tag marker by doubling it, like @@.")
 } / Tag+ OpenBrace .* !CloseBrace {
