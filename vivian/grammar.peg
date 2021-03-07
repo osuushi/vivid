@@ -18,11 +18,13 @@ Text <- ( !EscapedChar . / EscapeSequence )+ {
   }, nil
 }
 
-Input <- TagMarker "-" components:InputComponent+ {
+Input <- TagMarker "-" components:InputComponent+ SpaceChomper? {
   return &InputNode {
     Path: makeStringSlice(components),
   }, nil
 }
+
+SpaceChomper <- "~" _
 
 InputComponent <- name:Identifier '.'? {
   return name.(string), nil
@@ -48,3 +50,5 @@ Identifier <- [A-Z0-9]i+ {
 TagMarker <- '\x01'
 OpenBrace <- '\x02'
 CloseBrace <- '\x03'
+
+_ "whitespace" ← [ \t\r\n]*
