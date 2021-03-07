@@ -44,7 +44,7 @@ func ParseString(str string) (*Ast, error) {
 		return nil, err
 	}
 
-	content, ok := result.(*ContentNode)
+	rootChildren, ok := result.([]interface{})
 	if !ok {
 		return nil, fmt.Errorf(
 			"Unexpected type for parsed content: %s",
@@ -52,7 +52,10 @@ func ParseString(str string) (*Ast, error) {
 		)
 	}
 
-	ast.Content = content
+	ast.Content = &ContentNode{
+		Tags:     []string{"root"},
+		Children: rootChildren,
+	}
 	transformOutput(ast, ast)
 
 	return ast, nil
@@ -123,10 +126,6 @@ func setTokens(strPtr *string, ast *Ast) error {
 // internal errors.
 func transformInput(ast *Ast, stringReader *bufio.Reader, writer *io.PipeWriter) {
 	bufWriter := bufio.NewWriter(writer)
-	// Wrap with the root tag
-	bufWriter.WriteRune(tagMarker)
-	bufWriter.WriteString("root")
-	bufWriter.WriteRune(openBrace)
 
 	for {
 		char, _, err := stringReader.ReadRune()
@@ -150,9 +149,6 @@ func transformInput(ast *Ast, stringReader *bufio.Reader, writer *io.PipeWriter)
 			panic(err)
 		}
 	}
-
-	// Close the root tag
-	bufWriter.WriteRune(closeBrace)
 
 	// Flush and close the writer
 	err := bufWriter.Flush()

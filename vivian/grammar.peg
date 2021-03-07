@@ -3,8 +3,8 @@
 package vivian
 }
 
-Root <- content:Content EOF {
-  return content, nil
+Root <- exprList:(Content / Input / Text)+ EOF {
+  return exprList, nil
 }
 
 Content <- tags:Tag+ OpenBrace children:(Content / Input / Text )* CloseBrace {
@@ -14,8 +14,10 @@ Content <- tags:Tag+ OpenBrace children:(Content / Input / Text )* CloseBrace {
   }, nil
 } / Tag+ !OpenBrace {
   return nil, fmt.Errorf("Expected open brace for tag. Did you mean make an input like `@-foo`?")
-} / Tag + OpenBrace + .* !CloseBrace {
+} / Tag+ OpenBrace .* !CloseBrace {
   return nil, fmt.Errorf("Expected close brace for tag.")
+} / TagMarker OpenBrace {
+  return nil, fmt.Errorf("Expected a tag name")
 }
 
 // Text requires escaping
@@ -24,8 +26,6 @@ Text <- chunks:( UnescapedChars / EscapeSequence )+ {
   return &TextNode{
     Text: strings.Join(chunkSlice, ""),
   }, nil
-} / (UnescapedChars / EscapeSequence / CloseBrace)+ {
-  return nil, fmt.Errorf("Unexpected close brace")
 }
 
 Input <- TagMarker "-" components:InputComponent+ SpaceChomper? {
