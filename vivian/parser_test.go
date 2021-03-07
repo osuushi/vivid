@@ -8,7 +8,7 @@ import (
 )
 
 func TestParseString(t *testing.T) {
-	check := func(expr string, wantErr bool, expectedChildren ...interface{}) {
+	check := func(expr string, wantErr bool, expectedChildren ...Node) {
 		actualAst, err := ParseString(expr)
 		if err != nil {
 			if !wantErr {
@@ -28,15 +28,15 @@ func TestParseString(t *testing.T) {
 
 	check("@foo[]", false, &ContentNode{
 		Tag:      "foo",
-		Children: nil,
+		Children: []Node{},
 	})
 
 	check("@foo@bar[]", false, &ContentNode{
 		Tag: "foo",
-		Children: []interface{}{
+		Children: []Node{
 			&ContentNode{
 				Tag:      "bar",
-				Children: nil,
+				Children: []Node{},
 			},
 		},
 	})
@@ -48,12 +48,12 @@ func TestParseString(t *testing.T) {
 	// Swapped tokens
 	check("@{}@foo{}", false, &ContentNode{
 		Tag:      "foo",
-		Children: nil,
+		Children: []Node{},
 	})
 
 	check("@#><#foo><", false, &ContentNode{
 		Tag:      "foo",
-		Children: nil,
+		Children: []Node{},
 	})
 
 	// Escape hell

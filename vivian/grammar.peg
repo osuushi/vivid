@@ -3,8 +3,9 @@
 package vivian
 }
 
+
 Root <- exprList:Expr+ EOF {
-  return exprList, nil
+  return makeNodeSlice(exprList), nil
 } / Expr* CloseBrace {
   return nil, fmt.Errorf("Unexpected close brace")
 }
@@ -13,14 +14,14 @@ Expr <- Content / Input / Text
 
 Content <- tags:Tag+ OpenBrace children:Expr* CloseBrace {
   tagNames := makeStringSlice(tags)
-  childNodes := children.([]interface{})
+  childNodes := makeNodeSlice(children)
   var topNode *ContentNode
   for i := len(tagNames) - 1; i >= 0; i-- {
     topNode = &ContentNode{
       Tag: tagNames[i],
       Children: childNodes,
     }
-    childNodes = []interface{}{topNode}
+    childNodes = []Node{topNode}
   }
 	return topNode, nil
 } / Tag+ !OpenBrace {

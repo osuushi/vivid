@@ -44,7 +44,7 @@ func ParseString(str string) (*Ast, error) {
 		return nil, err
 	}
 
-	rootChildren, ok := result.([]interface{})
+	rootChildren, ok := result.([]Node)
 	if !ok {
 		return nil, fmt.Errorf(
 			"Unexpected type for parsed content: %s",
@@ -163,7 +163,7 @@ func transformInput(ast *Ast, stringReader *bufio.Reader, writer *io.PipeWriter)
 }
 
 // Undo the delimiter transformation to restore original characters
-func transformOutput(ast *Ast, currentNode interface{}) {
+func transformOutput(ast *Ast, currentNode Node) {
 	switch currentNode.(type) {
 	case *Ast:
 		transformOutput(ast, currentNode.(*Ast).Content)

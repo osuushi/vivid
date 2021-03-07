@@ -21,7 +21,7 @@ type ContentNode struct {
 	Tag string
 
 	// Children can be ContentNodes, TextNodes, or InterpolationNodes
-	Children []interface{}
+	Children []Node
 }
 
 // A node representing an input from the template context
@@ -32,4 +32,8 @@ type InputNode struct {
 
 type TextNode struct {
 	Text string
+}
+
+type Node interface {
+	String() string
 }
