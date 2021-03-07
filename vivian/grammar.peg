@@ -5,6 +5,8 @@ package vivian
 
 Root <- exprList:Expr+ EOF {
   return exprList, nil
+} / Expr* CloseBrace {
+  return nil, fmt.Errorf("Unexpected close brace")
 }
 
 Expr <- Content / Input / Text
