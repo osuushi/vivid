@@ -87,4 +87,5 @@ func TestParseString(t *testing.T) {
 	check("foo]", true)
 	check("foo @[", true)
 	check("This is a @test", true)
+	check("This has @- but no input path", true)
 }

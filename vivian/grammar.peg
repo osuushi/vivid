@@ -3,11 +3,13 @@
 package vivian
 }
 
-Root <- exprList:(Content / Input / Text)+ EOF {
+Root <- exprList:Expr+ EOF {
   return exprList, nil
 }
 
-Content <- tags:Tag+ OpenBrace children:(Content / Input / Text )* CloseBrace {
+Expr <- Content / Input / Text
+
+Content <- tags:Tag+ OpenBrace children:Expr* CloseBrace {
 	return &ContentNode{
     Tags: makeStringSlice(tags),
     Children: children.([]interface{}),
@@ -32,6 +34,8 @@ Input <- TagMarker "-" components:InputComponent+ SpaceChomper? {
   return &InputNode {
     Path: makeStringSlice(components),
   }, nil
+} / TagMarker "-" !InputComponent {
+  return nil, fmt.Errorf("Expected an input path")
 }
 
 SpaceChomper <- "~" _

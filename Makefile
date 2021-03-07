@@ -7,6 +7,5 @@ build: *.peg *.go
 
 .PHONY: test
 
-
-test:
+test: build
 	go test ./...
