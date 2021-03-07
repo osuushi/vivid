@@ -12,9 +12,10 @@ Content <- tags:Tag+ OpenBrace children:(Content / Input / Text )* CloseBrace {
 }
 
 // Text requires escaping
-Text <- ( !EscapedChar . / EscapeSequence )+ {
+Text <- chunks:( UnescapedChars / EscapeSequence )+ {
+  chunkSlice := makeStringSlice(chunks)
   return &TextNode{
-    Text: string(c.text),
+    Text: strings.Join(chunkSlice, ""),
   }, nil
 }
 
@@ -34,7 +35,11 @@ EscapeSequence <- TagMarker escapedChar: EscapedChar {
   return string(escapedChar.([]byte)), nil
 }
 
-EscapedChar <- TagMarker / OpenBrace / CloseBrace
+UnescapedChars <- (!EscapedChar .)+ {
+  return string(c.text), nil
+}
+
+EscapedChar <- TagMarker / CloseBrace
 
 Tag <- TagMarker tagName:Identifier {
   return tagName.(string), nil

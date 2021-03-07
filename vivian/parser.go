@@ -29,7 +29,7 @@ func ParseString(str string) (*Ast, error) {
 
 	// Handle delimiter mode
 	if strings.HasPrefix(str, "@") {
-
+		setTokens(&str, ast)
 	}
 
 	stringReader := bufio.NewReader(strings.NewReader(str))
@@ -53,6 +53,10 @@ func ParseString(str string) (*Ast, error) {
 	transformOutput(ast, ast)
 
 	return ast, nil
+}
+
+func setTokens(str *string, ast *Ast) {
+
 }
 
 // Only panics in here because the only ways for these to fail are catastrophic
