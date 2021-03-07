@@ -61,13 +61,23 @@ func ParseString(str string) (*Ast, error) {
 func setTokens(strPtr *string, ast *Ast) error {
 	reader := bufio.NewReader(strings.NewReader(*strPtr))
 	headerLength := 0
+
+	consumeRune := func() (rune, error) {
+		r, _, err := reader.ReadRune()
+		headerLength += 1
+		if err != nil {
+			return r, err
+		}
+		return r, nil
+
+	}
 	// First rune is already known
-	_, _, err := reader.ReadRune()
+	_, err := consumeRune()
 	if err != nil {
 		return err
 	}
 
-	r, _, err := reader.ReadRune()
+	r, err := consumeRune()
 	if err != nil {
 		return fmt.Errorf("@ is not a valid input. Did you mean @@?")
 	}
@@ -76,24 +86,21 @@ func setTokens(strPtr *string, ast *Ast) error {
 	if r == '@' {
 		return nil
 	}
-	headerLength += 1
 
 	if strings.ContainsRune(allowedTagMarkers, r) {
 		ast.TagMarker = r
-		r, _, err = reader.ReadRune()
+		r, err = consumeRune()
 		if err != nil {
 			return err
 		}
-		headerLength += 1
 	}
 
 	if !strings.ContainsRune(allowedBraces, r) {
 		return fmt.Errorf("%q is not an allowed brace type; allowed: %q", r, allowedBraces)
 	}
 	ast.OpenBrace = r
-	headerLength += 1
 
-	r, _, err = reader.ReadRune()
+	r, err = consumeRune()
 	if err != nil {
 		return err
 	}
@@ -104,7 +111,6 @@ func setTokens(strPtr *string, ast *Ast) error {
 		return fmt.Errorf("Cannot use the same brace for open and close")
 	}
 	ast.CloseBrace = r
-	headerLength += 1
 
 	*strPtr = (*strPtr)[headerLength:]
 	return nil
