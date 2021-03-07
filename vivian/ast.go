@@ -35,5 +35,5 @@ type TextNode struct {
 }
 
 type Node interface {
-	String() string
+	String(root *Ast) string
 }

@@ -163,7 +163,7 @@ func transformInput(ast *Ast, stringReader *bufio.Reader, writer *io.PipeWriter)
 }
 
 // Undo the delimiter transformation to restore original characters
-func transformOutput(ast *Ast, currentNode Node) {
+func transformOutput(ast *Ast, currentNode interface{}) {
 	switch currentNode.(type) {
 	case *Ast:
 		transformOutput(ast, currentNode.(*Ast).Content)
