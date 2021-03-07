@@ -6,4 +6,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run tests
-        run: make test
+        run: |
+          export $PATH:$HOME/go/bin
+          make test
