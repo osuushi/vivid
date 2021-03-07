@@ -98,7 +98,8 @@ func setTokens(strPtr *string, ast *Ast) error {
 	}
 
 	if !strings.ContainsRune(allowedBraces, r) {
-		return fmt.Errorf("%q is not an allowed brace type; allowed: %q", r, allowedBraces)
+		// Not a header; could be an input node
+		return nil
 	}
 	ast.OpenBrace = r
 

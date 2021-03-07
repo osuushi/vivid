@@ -70,7 +70,7 @@ func TestConcat(t *testing.T) {
 		t.Errorf("Expected %q but got %q", expectedString, actualString)
 	}
 
-	if diff := deep.Equal(expectedBolds, actualBolds); diff != nil {
+	if diff := deep.Equal(actualBolds, expectedBolds); diff != nil {
 		t.Error(diff)
 	}
 }
