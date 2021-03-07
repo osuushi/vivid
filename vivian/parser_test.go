@@ -87,6 +87,7 @@ func TestParseString(t *testing.T) {
 	check("]", true)
 	check("foo]", true)
 	check("foo @[", true)
+	check("My email is ada@example.com", true)
 	check("This is a @test", true)
 	check("This has @- but no input path", true)
 	check("This @-path.ends.in.a.dot.", true)

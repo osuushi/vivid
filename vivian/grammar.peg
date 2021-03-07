@@ -17,7 +17,7 @@ Content <- tags:Tag+ OpenBrace children:Expr* CloseBrace {
     Children: children.([]interface{}),
   }, nil
 } / Tag+ !OpenBrace {
-  return nil, fmt.Errorf("Expected open brace for tag. Did you mean make an input like `@-foo`?")
+  return nil, fmt.Errorf("Expected open brace for tag. Escape the tag marker by doubling it, like @@.")
 } / Tag+ OpenBrace .* !CloseBrace {
   return nil, fmt.Errorf("Expected close brace for tag.")
 } / TagMarker OpenBrace {
