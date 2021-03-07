@@ -55,7 +55,7 @@ func TestParseString(t *testing.T) {
 	check("@!()foo@!!!)([]", false, &TextNode{Text: "foo@!)([]"})
 
 	// Multi-expressions
-	check("This is an @-adjective @-noun.", false,
+	check("This is an @-adjective @-noun~ .", false,
 		&TextNode{Text: "This is an "},
 		&InputNode{
 			Path: []string{"adjective"},
@@ -64,6 +64,7 @@ func TestParseString(t *testing.T) {
 		&InputNode{
 			Path: []string{"noun"},
 		},
+		&TextNode{Text: "."},
 	)
 
 	// Chomp character
@@ -88,4 +89,6 @@ func TestParseString(t *testing.T) {
 	check("foo @[", true)
 	check("This is a @test", true)
 	check("This has @- but no input path", true)
+	check("This @-path.ends.in.a.dot.", true)
+	check("This @-path..has..two.dots", true)
 }

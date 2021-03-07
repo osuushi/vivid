@@ -32,17 +32,27 @@ Text <- chunks:( UnescapedChars / EscapeSequence )+ {
   }, nil
 }
 
-Input <- TagMarker "-" components:InputComponent+ SpaceChomper? {
+Input <- TagMarker "-" nonFinalComponents:NonFinalInputComponent* finalComponent:FinalInputComponent SpaceChomper? {
   return &InputNode {
-    Path: makeStringSlice(components),
+    Path: append(makeStringSlice(nonFinalComponents), finalComponent.(string)),
   }, nil
-} / TagMarker "-" !InputComponent {
+} / TagMarker "-" !AnyInputComponent {
   return nil, fmt.Errorf("Expected an input path")
+} / TagMarker "-" NonFinalInputComponent+ "." {
+  return nil, fmt.Errorf("Unexpected period in input path")
+} / TagMarker "-" NonFinalInputComponent+ !FinalInputComponent {
+  return nil, fmt.Errorf("Unexpected trailing period on input path.\nTip: End a sentence with an input using a chomp, like `@-foo~ .`")
 }
 
 SpaceChomper <- "~" _
 
-InputComponent <- name:Identifier '.'? {
+AnyInputComponent "path component" <- NonFinalInputComponent / FinalInputComponent
+
+NonFinalInputComponent "path component" <- name:Identifier '.' {
+  return name.(string), nil
+}
+
+FinalInputComponent "last path component" <- name:Identifier !'.' {
   return name.(string), nil
 }
 
