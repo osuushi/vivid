@@ -66,16 +66,18 @@ func setTokens(strPtr *string, ast *Ast) error {
 		r, _, err := reader.ReadRune()
 		headerLength += 1
 		if err != nil {
+			if err != io.EOF {
+				// EOF should be the only possible error
+				panic(err)
+			}
 			return r, err
 		}
 		return r, nil
 
 	}
+
 	// First rune is already known
-	_, err := consumeRune()
-	if err != nil {
-		return err
-	}
+	consumeRune()
 
 	r, err := consumeRune()
 	if err != nil {
@@ -91,7 +93,7 @@ func setTokens(strPtr *string, ast *Ast) error {
 		ast.TagMarker = r
 		r, err = consumeRune()
 		if err != nil {
-			return err
+			return fmt.Errorf("Unexpected end of input. Tag marker should be followed by brace types")
 		}
 	}
 
@@ -102,7 +104,7 @@ func setTokens(strPtr *string, ast *Ast) error {
 
 	r, err = consumeRune()
 	if err != nil {
-		return err
+		return fmt.Errorf("Unexpected end of input. Must provide both open and close brace")
 	}
 	if !strings.ContainsRune(allowedBraces, r) {
 		return fmt.Errorf("%q is not an allowed brace type; allowed: %q", r, allowedBraces)
