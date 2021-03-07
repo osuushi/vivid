@@ -1,0 +1,50 @@
+{
+// Grammar for the vivian row formatting language
+package vivian
+}
+
+
+Content <- tags:Tag+ OpenBrace children:(Content / Input / Text )* CloseBrace {
+	return &ContentNode{
+    Tags: makeStringSlice(tags),
+    Children: children.([]interface{}),
+  }, nil
+}
+
+// Text requires escaping
+Text <- ( !EscapedChar . / EscapeSequence )+ {
+  return &TextNode{
+    Text: string(c.text),
+  }, nil
+}
+
+Input <- TagMarker "-" components:InputComponent+ {
+  return &InputNode {
+    Path: makeStringSlice(components),
+  }, nil
+}
+
+InputComponent <- name:Identifier '.'? {
+  return name.(string), nil
+}
+
+EscapeSequence <- TagMarker escapedChar: EscapedChar {
+  return string(escapedChar.([]byte)), nil
+}
+
+EscapedChar <- TagMarker / OpenBrace / CloseBrace
+
+Tag <- TagMarker tagName:Identifier {
+  return tagName.(string), nil
+}
+
+Identifier <- [A-Z0-9]i+ {
+  return string(c.text), nil
+}
+
+// Tags are normalized using ASCII control characters for start of header, start
+// of text, and end of text, since it doesn't make sense to use these characters
+// in text meant for display.
+TagMarker <- '\x01'
+OpenBrace <- '\x02'
+CloseBrace <- '\x03'
