@@ -8,6 +8,13 @@ import (
 	"github.com/osuushi/vivid/vivian"
 )
 
+// This takes all cell-creating nodes and moves them to the top level, splitting
+// up existing nodes as needed.
+func hoistCells(ast *vivian.Ast) error {
+	_, err := hoistContentNode(ast.Content)
+	return err
+}
+
 // Tag names that cause a cell to be created, and therefore must be moved to the
 // top level.
 var cellCreatingNamePrefixes = []string{
@@ -40,19 +47,20 @@ func isCellCreator(name string) bool {
 	return false
 }
 
+func isRootNode(node vivian.Node) bool {
+	contentNode, ok := node.(*vivian.ContentNode)
+	if !ok { // Non-content node never a cell creator
+		return false
+	}
+	return contentNode.Tag == "_root"
+}
+
 func isCellCreatorNode(node vivian.Node) bool {
 	contentNode, ok := node.(*vivian.ContentNode)
 	if !ok { // Non-content node never a cell creator
 		return false
 	}
 	return isCellCreator(contentNode.Tag)
-}
-
-// This takes all cell-creating nodes and moves them to the top level, splitting
-// up existing nodes as needed.
-func hoistCells(ast *vivian.Ast) error {
-	_, err := hoistContentNode(ast.Content)
-	return err
 }
 
 // Copy a content node, but not its children
@@ -75,7 +83,9 @@ func hoistContentNode(node *vivian.ContentNode) ([]vivian.Node, error) {
 		return nil, err
 	}
 
-	if isCellCreator(node.Tag) {
+	if isRootNode(node) {
+		return nil, nil
+	} else if isCellCreator(node.Tag) {
 		// Cell creators require validation, but no manipulation once teir children
 		// have been hoisted above.
 		err = validateCellCreatorChildren(node)
@@ -87,8 +97,6 @@ func hoistContentNode(node *vivian.ContentNode) ([]vivian.Node, error) {
 	} else {
 		return hoistStyle(node)
 	}
-
-	return nil, nil
 }
 
 // Hoist all children first. This process may turn any child node into
@@ -212,7 +220,7 @@ func validateCellCreatorChildren(node *vivian.ContentNode) error {
 
 	// For multiple children, no child may be a cell creator
 	for _, child := range node.Children {
-		if isCellCreatorNode(node) {
+		if isCellCreatorNode(child) {
 			return fmt.Errorf(
 				"Sizing element %q cannot be subdivided by %q.\n"+
 					"  May contain exactly one sizing element, OR zero or more style elements.",
