@@ -79,9 +79,9 @@ func TestHoistCells(t *testing.T) {
 	)
 
 	// Errors
-	checkErr("@wrap[@max30[hello] @auto[world]]", "subdivided by \"max30\"")
+	checkErr("@wrap[@max30[hello] @fixed30[world]]", "subdivided by \"max30\"")
 	checkErr("@wrap[@max30[hello] @red[world]]", "subdivided by \"max30\"")
 	checkErr("@wrap[@max30[hello] world]", "subdivided by \"max30\"")
-	checkErr("@wrap[@max30[@auto[hello]] world]", "subdivided by \"max30\"")
-	checkErr("@wrap[@max30[@auto[hello] world]]", "subdivided by \"auto\"")
+	checkErr("@wrap[@max30[@fixed50[hello]] world]", "subdivided by \"max30\"")
+	checkErr("@wrap[@max30[@fixed50[hello] world]]", "subdivided by \"fixed50\"")
 }

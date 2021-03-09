@@ -2,8 +2,6 @@ package render
 
 import (
 	"fmt"
-	"strings"
-	"unicode"
 
 	"github.com/osuushi/vivid/vivian"
 )
@@ -15,52 +13,12 @@ func hoistCells(ast *vivian.Ast) error {
 	return err
 }
 
-// Tag names that cause a cell to be created, and therefore must be moved to the
-// top level.
-var cellCreatingNamePrefixes = []string{
-	"min",
-	"max",
-	"auto",
-	"wrap",
-	"fixed",
-}
-
-func isNumeric(str string) bool {
-	for _, r := range str {
-		if !unicode.IsDigit(r) {
-			return false
-		}
-	}
-	return true
-}
-
-func isCellCreator(name string) bool {
-	for _, prefix := range cellCreatingNamePrefixes {
-		if !strings.HasPrefix(name, prefix) {
-			continue
-		}
-		suffix := strings.TrimPrefix(name, prefix)
-		if isNumeric(suffix) {
-			return true
-		}
-	}
-	return false
-}
-
 func isRootNode(node vivian.Node) bool {
 	contentNode, ok := node.(*vivian.ContentNode)
 	if !ok { // Non-content node never a cell creator
 		return false
 	}
 	return contentNode.Tag == "_root"
-}
-
-func isCellCreatorNode(node vivian.Node) bool {
-	contentNode, ok := node.(*vivian.ContentNode)
-	if !ok { // Non-content node never a cell creator
-		return false
-	}
-	return isCellCreator(contentNode.Tag)
 }
 
 // Copy a content node, but not its children

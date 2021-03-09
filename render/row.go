@@ -3,13 +3,11 @@ package render
 import (
 	"fmt"
 
-	"github.com/osuushi/vivid/rich"
 	"github.com/osuushi/vivid/vivian"
 )
 
 type Row struct {
 	Cells []Cell
-	Style rich.Style
 }
 
 func MakeRow(input string) (*Row, error) {
