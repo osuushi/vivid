@@ -2,17 +2,25 @@ package render
 
 import (
 	"fmt"
+	"math"
 	"regexp"
 	"strconv"
+
+	"github.com/thomaso-mirodin/intmath/intgr"
 
 	"github.com/osuushi/vivid/vivian"
 )
 
 type Cell struct {
-	MinWidth  int
-	MaxWidth  int
-	Wrap      bool
-	Greedy    bool
+	MinWidth int
+	MaxWidth int
+	Wrap     bool
+
+	Greedy bool
+
+	Shyness int
+	Glue    bool
+
 	Alignment Alignment
 	Content   []vivian.Node
 }
@@ -62,7 +70,9 @@ func cellsFromAst(hoistedAst *vivian.Ast) ([]*Cell, error) {
 }
 
 func makeDefaultCell() *Cell {
-	return &Cell{}
+	return &Cell{
+		MaxWidth: math.MaxInt16,
+	}
 }
 
 func cellFromCellCreator(node vivian.Node) (*Cell, error) {
@@ -108,6 +118,10 @@ func applyTag(tag string, cell *Cell) error {
 		cell.MaxWidth = param
 	case "strut":
 		cell.Greedy = true
+	case "shy":
+		cell.Shyness = intgr.Min(param, 1)
+	case "glue":
+		cell.Glue = true
 	case "left":
 		// Pointless assignment, but for consistency
 		cell.Alignment = Left
