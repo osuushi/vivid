@@ -119,7 +119,7 @@ func applyTag(tag string, cell *Cell) error {
 	case "strut":
 		cell.Greedy = true
 	case "shy":
-		cell.Shyness = intgr.Min(param, 1)
+		cell.Shyness = intgr.Max(param, 1)
 	case "glue":
 		cell.Glue = true
 	case "left":

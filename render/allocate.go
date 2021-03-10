@@ -1,6 +1,8 @@
 package render
 
-import "github.com/thomaso-mirodin/intmath/intgr"
+import (
+	"github.com/thomaso-mirodin/intmath/intgr"
+)
 
 // A cell whose size has been calculated to fit
 type SizedCell struct {
@@ -19,9 +21,20 @@ func AllocateCellSizes(cells []*Cell, width int) []*SizedCell {
 		return []*SizedCell{}
 	}
 
+	head := makeSizedCellList(cells)
+
+	head.applyMinimumSizes(width)
+	head.trimShyCells(width)
+	head.expandCells(width, true)
+	head.expandCells(width, false)
+
+	return head.toSlice()
+}
+
+func makeSizedCellList(cells []*Cell) *scNode {
 	// Create sized cell list
 	head := &scNode{
-		val: &SizedCell{Cell: cells[1]},
+		val: &SizedCell{Cell: cells[0]},
 	}
 
 	lastNode := head
@@ -33,13 +46,7 @@ func AllocateCellSizes(cells []*Cell, width int) []*SizedCell {
 		node.prev = lastNode
 		lastNode = node
 	}
-
-	head.applyMinimumSizes(width)
-	head.trimShyCells(width)
-	head.expandCells(width, true)
-	head.expandCells(width, false)
-
-	return head.toSlice()
+	return head
 }
 
 // Doubly linked list used for allocation
@@ -156,8 +163,8 @@ func (n *scNode) shyestNode() *scNode {
 	shyest := n
 	n.each(func(node *scNode) {
 		// Using >= instead of > means we tiebreak to the right
-		if n.val.Cell.Shyness >= shyest.val.Cell.Shyness {
-			shyest = n
+		if node.val.Cell.Shyness >= shyest.val.Cell.Shyness {
+			shyest = node
 		}
 	})
 	return shyest
