@@ -38,8 +38,7 @@ func TestCellsFromAst(t *testing.T) {
 		&Cell{
 			MaxWidth: 30,
 		},
-		// Space by itself gets its own cell
-		makeDefaultCell(),
+		// Note that space was culled because it was in its own implicit cell
 		&Cell{
 			MinWidth:  50,
 			MaxWidth:  50,

@@ -74,6 +74,5 @@ func TestTrimShyCells(t *testing.T) {
 	check("@fixed30[foo]@fixed30@shy2[bar]@fixed30@shy[baz]", 70, "foo baz")
 	check("@fixed30[foo]@fixed30@shy[bar]@fixed30[baz]", 70, "foo baz")
 	check("@fixed30[foo]@fixed30@shy[bar]@fixed30@glue[baz]", 70, "foo")
-	// This will pass after we cull implied whitespace cells
-	// check("@fixed30[foo]@fixed30@shy[bar] @fixed30@glue[baz]", 70, "foo")
+	check("@fixed30[foo] @fixed30@shy[bar] @fixed30@glue[baz]", 70, "foo")
 }

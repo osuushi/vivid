@@ -5,6 +5,7 @@ import (
 	"math"
 	"regexp"
 	"strconv"
+	"unicode"
 
 	"github.com/thomaso-mirodin/intmath/intgr"
 
@@ -46,6 +47,14 @@ func cellsFromAst(hoistedAst *vivian.Ast) ([]*Cell, error) {
 		if len(currentCellNodes) == 0 {
 			return
 		}
+
+		// If a cell was created implicitly and contains no non-space or input, it
+		// is omitted.
+		if isEmptyImplicitCell(currentCellNodes) {
+			currentCellNodes = []vivian.Node{}
+			return
+		}
+
 		cell := makeDefaultCell()
 		cell.Content = currentCellNodes
 		cells = append(cells, cell)
@@ -88,6 +97,45 @@ func cellFromCellCreator(node vivian.Node) (*Cell, error) {
 	}
 	cell.Content = contentNode.Children
 	return cell, nil
+}
+
+func isEmptyImplicitCell(nodes []vivian.Node) bool {
+	for _, node := range nodes {
+		if !isEmptyNode(node) {
+			return false
+		}
+	}
+	return true
+}
+
+// Is the node "empty", meaning it contains nothing but whitespace, regardless
+// of style?
+func isEmptyNode(node vivian.Node) bool {
+	switch node := node.(type) {
+	case *vivian.ContentNode: // empty if all children are empty
+		for _, child := range node.Children {
+			if !isEmptyNode(child) {
+				return false
+			}
+			return true
+		}
+	case *vivian.InputNode: // An input node is never empty
+		return false
+	case *vivian.TextNode: // Empty if nothing but whitespace
+		return isStringWhitespace(node.Text)
+	default:
+		panic(fmt.Sprintf("Unknown node type: %v", node))
+	}
+	return false
+}
+
+func isStringWhitespace(s string) bool {
+	for _, r := range s {
+		if !unicode.IsSpace(r) {
+			return false
+		}
+	}
+	return true
 }
 
 var tagParsePattern *regexp.Regexp
