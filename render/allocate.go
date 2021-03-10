@@ -24,7 +24,8 @@ func AllocateCellSizes(cells []*Cell, width int) []*SizedCell {
 	head := makeSizedCellList(cells)
 
 	head.applyMinimumSizes(width)
-	head.trimShyCells(width)
+	head = head.trimShyCells(width)
+
 	head.expandCells(width, true)
 	head.expandCells(width, false)
 
@@ -100,10 +101,13 @@ func (n *scNode) applyMinimumSizes(width int) {
 	})
 }
 
-func (n *scNode) trimShyCells(width int) {
+// Remove shy cells and return the new list head (since the existing head may be
+// trimmed)
+func (n *scNode) trimShyCells(width int) *scNode {
 	total := n.totalWidth()
 	for total > width {
 		toDelete := n.shyestNode()
+
 		// Walk back to first glued node
 		for {
 			if toDelete.val.Cell.Glue && toDelete.prev != nil {
@@ -116,6 +120,12 @@ func (n *scNode) trimShyCells(width int) {
 		// Start deleting nodes until we no longer see one that is glued
 		for {
 			total -= toDelete.val.Width
+
+			// Special case where we're deleting the head
+			if toDelete == n {
+				n = n.next
+			}
+
 			toDelete.delete()
 			if toDelete.next != nil && toDelete.next.val.Cell.Glue {
 				toDelete = toDelete.next
@@ -124,6 +134,8 @@ func (n *scNode) trimShyCells(width int) {
 			}
 		}
 	}
+
+	return n
 }
 
 func (n *scNode) expandCells(width int, greedy bool) {

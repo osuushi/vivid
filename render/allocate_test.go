@@ -57,7 +57,7 @@ func TestTrimShyCells(t *testing.T) {
 
 		list := makeSizedCellList(cells)
 		list.applyMinimumSizes(width)
-		list.trimShyCells(width)
+		list = list.trimShyCells(width)
 		sized := list.toSlice()
 
 		actual := getAllCellText(sized)
@@ -69,10 +69,14 @@ func TestTrimShyCells(t *testing.T) {
 		}
 	}
 
-	check("@fixed30[foo]@fixed30@shy[bar]@fixed30@shy[baz]", 90, "foo bar baz")
-	check("@fixed30[foo]@fixed30@shy[bar]@fixed30@shy[baz]", 70, "foo bar")
-	check("@fixed30[foo]@fixed30@shy2[bar]@fixed30@shy[baz]", 70, "foo baz")
-	check("@fixed30[foo]@fixed30@shy[bar]@fixed30[baz]", 70, "foo baz")
-	check("@fixed30[foo]@fixed30@shy[bar]@fixed30@glue[baz]", 70, "foo")
+	check("@fixed30[foo] @fixed30[bar] @fixed30[baz]", 90, "foo bar baz")
+	check("@fixed30[foo] @fixed30[bar] @fixed30[baz]", 70, "foo bar")
+	check("@fixed30[foo] @fixed30[bar] @fixed30[baz]", 30, "foo")
+	check("@fixed30[foo] @fixed30[bar] @fixed30[baz]", 20, "")
+	check("@fixed30@shy[foo] @fixed30[bar] @fixed30[baz]", 30, "bar")
+	check("@fixed30[foo] @fixed30@shy[bar] @fixed30@shy[baz]", 90, "foo bar baz")
+	check("@fixed30[foo] @fixed30@shy[bar] @fixed30@shy[baz]", 70, "foo bar")
+	check("@fixed30[foo] @fixed30@shy2[bar] @fixed30@shy[baz]", 70, "foo baz")
+	check("@fixed30[foo] @fixed30@shy[bar] @fixed30[baz]", 70, "foo baz")
 	check("@fixed30[foo] @fixed30@shy[bar] @fixed30@glue[baz]", 70, "foo")
 }
