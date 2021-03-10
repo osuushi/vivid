@@ -24,7 +24,8 @@ func makeCells(s string) []*Cell {
 
 // Helper to get cell text. Assumes the cell ultimately just contains a text
 // node
-func getInnerCellText(cell *Cell) string {
+func getCellText(sizedCell *SizedCell) string {
+	cell := sizedCell.Cell
 	node := cell.Content[0]
 	for {
 		textNode, ok := node.(*vivian.TextNode)
@@ -42,9 +43,31 @@ func getInnerCellText(cell *Cell) string {
 func getAllCellText(cells []*SizedCell) string {
 	texts := []string{}
 	for _, cell := range cells {
-		texts = append(texts, getInnerCellText(cell.Cell))
+		texts = append(texts, getCellText(cell))
 	}
 	return strings.Join(texts, " ")
+}
+
+func TestShyestNode(t *testing.T) {
+	check := func(input, expected string) {
+		cells := makeCells(input)
+		list := makeSizedCellList(cells)
+		actual := getCellText(list.shyestNode().val)
+		if actual != expected {
+			t.Errorf(
+				"shyestNode() for %q\nExpected: %q\nGot:%q",
+				input, expected, actual,
+			)
+		}
+	}
+
+	check("@fixed30[foo] @fixed30[bar] @fixed30[baz]", "baz")
+	check("@fixed30@shy[foo] @fixed30[bar] @fixed30[baz]", "foo")
+	check("@fixed30@shy[foo] @fixed30@shy[bar] @fixed30[baz]", "bar")
+	check("@fixed30@shy[foo] @fixed30@shy[bar] @fixed30@shy[baz]", "baz")
+	check("@fixed30@shy2[foo] @fixed30@shy[bar] @fixed30@shy[baz]", "foo")
+	check("@fixed30@shy2[foo] @fixed30@shy[bar] @fixed30@shy2[baz]", "baz")
+	check("@fixed30@shy4[foo] @fixed30@shy2[bar] @fixed30@shy3[baz]", "foo")
 }
 
 func TestTrimShyCells(t *testing.T) {
@@ -54,7 +77,6 @@ func TestTrimShyCells(t *testing.T) {
 		expected string,
 	) {
 		cells := makeCells(input)
-
 		list := makeSizedCellList(cells)
 		list.applyMinimumSizes(width)
 		list = list.trimShyCells(width)
