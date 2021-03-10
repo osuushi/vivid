@@ -93,7 +93,11 @@ func cellFromCellCreator(node vivian.Node) (*Cell, error) {
 		if err != nil {
 			return nil, err
 		}
-		node = contentNode.Children[0]
+		if len(contentNode.Children) == 0 {
+			node = nil
+		} else {
+			node = contentNode.Children[0]
+		}
 	}
 	cell.Content = contentNode.Children
 	return cell, nil

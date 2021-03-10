@@ -120,6 +120,10 @@ func (n *scNode) trimShyCells(width int) *scNode {
 		// Start deleting nodes until we no longer see one that is glued
 		for {
 			total -= toDelete.val.Width
+			// Unless deleting the last node, we also remove the padding
+			if toDelete.next != nil || toDelete.prev != nil {
+				total -= 1
+			}
 
 			// Special case where we're deleting the head
 			if toDelete == n {
@@ -185,7 +189,9 @@ func (n *scNode) shyestNode() *scNode {
 func (n *scNode) totalWidth() int {
 	total := 0
 	n.each(func(node *scNode) {
-		total += node.val.Width
+		total += node.val.Width + 1
 	})
+	// Delete padding from the last cell
+	total -= 1
 	return total
 }
