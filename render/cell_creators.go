@@ -10,11 +10,21 @@ import (
 // Tag names that cause a cell to be created, and therefore must be moved to the
 // top level.
 var cellCreatingNamePrefixes = []string{
-	"min",
-	"max",
-	"wrap",
-	"fixed",
-	"left",
+	// ** Types with parameter
+	"min",   // minimum width
+	"max",   // maximum width
+	"fixed", // same min and max
+	"wrap",  // wrap text; parameter is same as @wrap@fixedNN
+
+	// ** Types without parameter
+
+	// greedy cell; greedy cells eat up all free space up to their max before
+	// nongreedy cells have a chance to take on space above their min
+	"strut",
+
+	// Alignments; these are cell creators because it is meaningless to be aligned
+	// outside the context of a boundary.
+	"left", // this is a noop, but kept for consistency
 	"right",
 	"center",
 	"justify",

@@ -12,6 +12,7 @@ type Cell struct {
 	MinWidth  int
 	MaxWidth  int
 	Wrap      bool
+	Greedy    bool
 	Alignment Alignment
 	Content   []vivian.Node
 }
@@ -97,14 +98,16 @@ func applyTag(tag string, cell *Cell) error {
 		cell.MinWidth = param
 	case "max":
 		cell.MaxWidth = param
+	case "fixed":
+		cell.MinWidth = param
+		cell.MaxWidth = param
 	case "wrap":
 		cell.Wrap = true
 		// Number parameter is shorthand for @wrap@fixedNN
 		cell.MinWidth = param
 		cell.MaxWidth = param
-	case "fixed":
-		cell.MinWidth = param
-		cell.MaxWidth = param
+	case "strut":
+		cell.Greedy = true
 	case "left":
 		// Pointless assignment, but for consistency
 		cell.Alignment = Left

@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/go-test/deep"
-	"github.com/kr/pretty"
 	"github.com/osuushi/vivid/vivian"
 )
 
@@ -28,7 +27,7 @@ func TestCellsFromAst(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	pretty.Println(cells)
+
 	// Clear content nodes, since we don't want to test those after this point
 	for _, cell := range cells {
 		cell.Content = nil
@@ -40,8 +39,6 @@ func TestCellsFromAst(t *testing.T) {
 			MaxWidth: 30,
 		},
 		// Space by itself gets its own cell
-		// TODO: Should it? This should maybe be a special case, since the cell is
-		// effectively empty.
 		makeDefaultCell(),
 		&Cell{
 			MinWidth:  50,
