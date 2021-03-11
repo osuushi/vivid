@@ -30,3 +30,9 @@ func (r *RichRune) IsItalic() bool {
 func (r *RichRune) IsUnderline() bool {
 	return r.style.IsUnderline()
 }
+
+// Return a copy of the rune's style
+func (r *RichRune) GetStyle() *Style {
+	styleStruct := *r.style
+	return &styleStruct
+}

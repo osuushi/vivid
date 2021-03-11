@@ -53,14 +53,11 @@ func styleFromContentNode(tag string, parentStyle *rich.Style) (*rich.Style, err
 		Parent: parentStyle,
 	}
 	switch {
-	case tag == "bold":
-	case tag == "b":
+	case tag == "bold" || tag == "b":
 		style.Bold = rich.On
-	case tag == "italic":
-	case tag == "i":
+	case tag == "italic" || tag == "i":
 		style.Italic = rich.On
-	case tag == "underline":
-	case tag == "u":
+	case tag == "underline" || tag == "u":
 		style.Underline = rich.On
 	default:
 		if color, ok := parseColor(tag); ok {
