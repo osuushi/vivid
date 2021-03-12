@@ -71,3 +71,16 @@ func TestInherited(t *testing.T) {
 		t.Errorf("style.IsUnderline(): Expected true")
 	}
 }
+
+func TestRebase(t *testing.T) {
+	style := &Style{
+		Parent: &Style{
+			Parent: &Style{},
+		},
+	}
+	newRoot := &Style{}
+	rebasedStyle := style.Rebase(newRoot)
+	if rebasedStyle.Parent.Parent.Parent != newRoot {
+		t.Errorf("Expected newRoot to be injected after root")
+	}
+}

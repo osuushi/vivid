@@ -85,3 +85,15 @@ func (s *Style) IsItalic() bool {
 func (s *Style) IsUnderline() bool {
 	return s.inheritTristate(func(s *Style) Tristate { return s.Underline })
 }
+
+// Inject newRoot at the root, creating a new style
+func (s *Style) Rebase(newRoot *Style) *Style {
+	if s == rootStyle || s == nil {
+		return newRoot
+	}
+
+	// Shallow clone by dereference
+	styleStruct := *s
+	styleStruct.Parent = s.Parent.Rebase(newRoot)
+	return &styleStruct
+}
