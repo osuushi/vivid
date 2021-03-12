@@ -1,8 +1,11 @@
 package render
 
 import (
+	"strings"
 	"testing"
 
+	"github.com/go-test/deep"
+	"github.com/kr/pretty"
 	"github.com/osuushi/vivid/rich"
 )
 
@@ -43,4 +46,60 @@ func TestAlignRow(t *testing.T) {
 	check(39, Right, "right", "Whan that aprill with his shoures soote")
 	check(39, Center, "center", "Whan that aprill with his shoures soote")
 	check(39, Justify, "justify", "Whan that aprill with his shoures soote")
+}
+
+func TestMakeSpacer(t *testing.T) {
+	var actual string
+	actual = makeSpacer(0).String()
+	if actual != "" {
+		t.Errorf("Unexpected output for length 0: %q", actual)
+	}
+
+	actual = makeSpacer(1).String()
+	if actual != " " {
+		t.Errorf("Unexpected output for length 1: %q", actual)
+	}
+
+	actual = makeSpacer(2).String()
+	if actual != "  " {
+		t.Errorf("Unexpected output for length 2: %q", actual)
+	}
+}
+
+var testParagraph = `This is a test of paragraph slicing. Here's a long word: "antidisestablishmentarianism". Wow. What a mouthful.`
+
+func TestSliceParagraph(t *testing.T) {
+	check := func(width int, expected []string) {
+		actual := sliceParagraph(rich.NewRichString(testParagraph, nil), width)
+		actualStrings := []string{}
+		for _, row := range actual {
+			actualStrings = append(actualStrings, row.String())
+		}
+
+		if diff := deep.Equal(actualStrings, expected); diff != nil {
+			pretty.Println(actualStrings)
+			t.Errorf("For width %d\n%s", width, strings.Join(diff, "\n"))
+		}
+	}
+
+	check(30, []string{
+		"This is a test of paragraph",
+		"slicing. Here's a long word:",
+		"\"antidisestablishmentarianism\"",
+		". Wow. What a mouthful.",
+	})
+
+	check(40, []string{
+		"This is a test of paragraph slicing.",
+		"Here's a long word:",
+		"\"antidisestablishmentarianism\". Wow.",
+		"What a mouthful.",
+	})
+
+	check(70, []string{
+		"This is a test of paragraph slicing. Here's a long word:",
+		"\"antidisestablishmentarianism\". Wow. What a mouthful.",
+	})
+
+	check(len(testParagraph), []string{testParagraph})
 }

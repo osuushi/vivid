@@ -65,6 +65,7 @@ func normalizeWhitespace(content rich.RichString) rich.RichString {
 		}
 		c.Rune = r
 		result = append(result, c)
+		wasSpace = r == ' '
 	}
 
 	// Check if last character is a space. If so, omit it
@@ -84,6 +85,7 @@ func sliceParagraph(text rich.RichString, width int) []rich.RichString {
 	for text != nil {
 		var currentLine rich.RichString
 		currentLine, text = scanNextLine(text, width)
+
 		lines = append(lines, currentLine)
 	}
 	return lines
