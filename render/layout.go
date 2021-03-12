@@ -139,6 +139,12 @@ func alignRow(row rich.RichString, alignment Alignment, width int) rich.RichStri
 		return append(row, makeSpacer(width-len(row))...)
 	case Right:
 		return append(makeSpacer(width-len(row)), row...)
+	case Center:
+		freeSpace := width - len(row)
+		leftSide := freeSpace / 2
+		row = append(makeSpacer(leftSide), row...)
+		rightSide := freeSpace - leftSide
+		return append(row, makeSpacer(rightSide)...)
 	case Justify:
 		return justifyLine(row, width)
 	}
