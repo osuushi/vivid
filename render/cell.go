@@ -82,6 +82,9 @@ func cellsFromAst(hoistedAst *vivian.Ast) ([]*Cell, error) {
 
 func makeDefaultCell() *Cell {
 	return &Cell{
+		MinWidth: 1,
+		// Out of laziness, using MaxInt16 to avoid having to worry about overflows.
+		// This is far wider than any cell would reasonably be.
 		MaxWidth: math.MaxInt16,
 	}
 }
@@ -167,7 +170,7 @@ func applyTag(tag string, cell *Cell) error {
 
 	switch name {
 	case "min":
-		cell.MinWidth = param
+		cell.MinWidth = intgr.Max(param, 1)
 	case "max":
 		cell.MaxWidth = param
 	case "fixed":

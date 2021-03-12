@@ -17,7 +17,7 @@ func NewRichString(str string, style *Style) RichString {
 	richRunes := make(RichString, len(runes))
 	for i, r := range runes {
 		richRunes[i].Rune = r
-		richRunes[i].style = style
+		richRunes[i].Style = style
 	}
 	return richRunes
 }
@@ -105,4 +105,13 @@ func Concat(richStrings ...RichString) RichString {
 	}
 
 	return result
+}
+
+// Append a string, extending style from the last character
+func (rs RichString) Append(s string) RichString {
+	if len(rs) == 0 { // Can't copy style from nothing
+		return NewRichString(s, nil)
+	}
+
+	return Concat(rs, NewRichString(s, rs[len(rs)-1].Style))
 }

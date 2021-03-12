@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/go-test/deep"
+	"github.com/kr/pretty"
 	"github.com/osuushi/vivid/vivian"
 )
 
@@ -36,6 +37,7 @@ func TestCellsFromAst(t *testing.T) {
 	expected := []*Cell{
 		makeDefaultCell(),
 		&Cell{
+			MinWidth: 1,
 			MaxWidth: 30,
 		},
 		// Note that space was culled because it was in its own implicit cell
@@ -45,6 +47,8 @@ func TestCellsFromAst(t *testing.T) {
 			Alignment: Right,
 		},
 	}
+
+	pretty.Println(cells, expected)
 
 	if diff := deep.Equal(cells, expected); diff != nil {
 		t.Error("\n" + strings.Join(diff, "\n"))
