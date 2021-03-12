@@ -103,3 +103,20 @@ func TestSliceParagraph(t *testing.T) {
 
 	check(len(testParagraph), []string{testParagraph})
 }
+
+func TestNormalizeWhitespace(t *testing.T) {
+	check := func(input string, expected string) {
+		actual := normalizeWhitespace(rich.NewRichString(input, nil)).String()
+		if actual != expected {
+			t.Errorf("Expected %q, got %q", expected, actual)
+		}
+	}
+
+	check("Spaces are fine here", "Spaces are fine here")
+	check("This   has multi  spaces", "This has multi spaces")
+	check(" this has one leading space", "this has one leading space")
+	check("   this has leading spaces", "this has leading spaces")
+	check("this has one trailing space ", "this has one trailing space")
+	check("this has trailing spaces   ", "this has trailing spaces")
+	check("\t  this is \t   \t lousy \t \t with tabs", "this is lousy with tabs")
+}
