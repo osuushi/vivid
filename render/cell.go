@@ -9,6 +9,7 @@ import (
 
 	"github.com/thomaso-mirodin/intmath/intgr"
 
+	"github.com/osuushi/vivid/rich"
 	"github.com/osuushi/vivid/vivian"
 )
 
@@ -22,8 +23,9 @@ type Cell struct {
 	Shyness int
 	Glue    bool
 
-	Alignment Alignment
-	Content   []vivian.Node
+	Background *rich.RGB
+	Alignment  Alignment
+	Content    []vivian.Node
 }
 
 type Alignment byte
@@ -149,6 +151,14 @@ func init() {
 }
 
 func applyTag(tag string, cell *Cell) error {
+	// Special case is bg color, which does not follow the typical <name><number>
+	// pattern
+	color, isColor := parseBgColor(tag)
+	if isColor {
+		cell.Background = color
+		return nil
+	}
+
 	match := tagParsePattern.FindStringSubmatch(tag)
 	name := match[1]
 	// Only invalid parse is empty string, and it's fine for that to be zero

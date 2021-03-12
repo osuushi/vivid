@@ -50,6 +50,10 @@ func isNumeric(str string) bool {
 }
 
 func isCellCreator(name string) bool {
+	if isBgColor(name) {
+		return true
+	}
+
 	for _, prefix := range cellCreatingNamePrefixes {
 		if !strings.HasPrefix(name, prefix) {
 			continue

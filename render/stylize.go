@@ -7,7 +7,6 @@ import (
 	"github.com/osuushi/vivid/rich"
 	"github.com/osuushi/vivid/vivian"
 	"github.com/spf13/cast"
-	"golang.org/x/image/colornames"
 )
 
 /*
@@ -62,28 +61,9 @@ func styleFromContentNode(tag string, parentStyle *rich.Style) (*rich.Style, err
 	default:
 		if color, ok := parseColor(tag); ok {
 			style.Color = color
-		} else if color, ok := parseBgColor(tag); ok {
-			style.Background = color
 		} else {
 			return nil, fmt.Errorf("Unrecognized tag: %q", tag)
 		}
 	}
 	return style, nil
-}
-
-func parseColor(tag string) (*rich.RGB, bool) {
-	// First check html color names
-	rgba, ok := colornames.Map[tag]
-	if ok {
-		return rich.RGBA2RGB(rgba), true
-	}
-
-	return rich.RGBFromHex(tag)
-}
-
-func parseBgColor(tag string) (*rich.RGB, bool) {
-	if !strings.HasPrefix(tag, "bg") {
-		return nil, false
-	}
-	return parseColor(tag[2:])
 }

@@ -110,10 +110,10 @@ func TestStylizeNodes(t *testing.T) {
 
 	assertStyleMatch(
 		t,
-		"this is @fff@bg345678[hex colors]",
+		"this is @fff[hex] @345678[colors]",
 		nil,
 		"this is hex colors",
-		"        XXXXXXXXXX",
+		"        XXX       ",
 		"xfff foreground x345678 background",
 		func(r rich.RichRune) bool {
 			color := r.GetColor()
@@ -123,8 +123,19 @@ func TestStylizeNodes(t *testing.T) {
 			if *color != (rich.RGB{R: 0xff, G: 0xff, B: 0xff}) {
 				return false
 			}
+			return true
+		},
+	)
 
-			color = r.GetBackground()
+	assertStyleMatch(
+		t,
+		"this is @fff[hex] @345678[colors]",
+		nil,
+		"this is hex colors",
+		"            XXXXXX",
+		"xfff foreground x345678 background",
+		func(r rich.RichRune) bool {
+			color := r.GetColor()
 			if color == nil {
 				return false
 			}
