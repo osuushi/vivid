@@ -46,7 +46,9 @@ func truncateContentToWidth(content rich.RichString, width int) rich.RichString 
 
 func normalizeWhitespace(content rich.RichString) rich.RichString {
 	if len(content) == 0 {
-		return content
+		// Since the other case returns a copy, so should this. It's very cheap, and
+		// this defends against bugs later.
+		return rich.RichString{}
 	}
 	result := make(rich.RichString, 0, len(content))
 	// Consider the string to be left-extended with spaces; we trim leading and
