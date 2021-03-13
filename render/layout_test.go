@@ -142,3 +142,33 @@ func TestTruncateContentToWidth(t *testing.T) {
 	check("This is a test", 13, "This is a te…")
 	check("This is a test", 14, "This is a test")
 }
+
+// Smoke test, putting it all together
+func TestRenderContent(t *testing.T) {
+	input := strings.TrimSpace(`
+		This is a test that has multiple paragraphs.
+
+		See? This is technically the third paragraph because of the empty line.
+	`)
+
+	actualRichStrings := renderContent(
+		rich.NewRichString(input, nil),
+		44,
+		true,
+		Left,
+	)
+	actual := []string{}
+	for _, rs := range actualRichStrings {
+		actual = append(actual, rs.String())
+	}
+	expected := []string{
+		"This is a test that has multiple paragraphs.",
+		"                                            ",
+		"See? This is technically the third paragraph",
+		"because of the empty line.                  ",
+	}
+
+	if diff := deep.Equal(actual, expected); diff != nil {
+		t.Errorf("\n" + strings.Join(diff, "\n"))
+	}
+}
