@@ -66,11 +66,12 @@ func TestMakeSpacer(t *testing.T) {
 	}
 }
 
-var testParagraph = `This is a test of paragraph slicing. Here's a long word: "antidisestablishmentarianism". Wow. What a mouthful.`
+var testParagraph = "This   is\ta test of paragraph slicing. Here's a long word: \"antidisestablishmentarianism\". Wow. What a mouthful."
 
 func TestSliceParagraph(t *testing.T) {
 	check := func(width int, expected []string) {
 		actual := sliceParagraph(rich.NewRichString(testParagraph, nil), width)
+
 		actualStrings := []string{}
 		for _, row := range actual {
 			actualStrings = append(actualStrings, row.String())
@@ -107,8 +108,6 @@ func TestSliceParagraph(t *testing.T) {
 		"This is a test of paragraph slicing. Here's a long word:",
 		"\"antidisestablishmentarianism\". Wow. What a mouthful.",
 	})
-
-	check(len(testParagraph), []string{testParagraph})
 }
 
 func TestNormalizeWhitespace(t *testing.T) {
@@ -146,9 +145,9 @@ func TestTruncateContentToWidth(t *testing.T) {
 // Smoke test, putting it all together
 func TestRenderContent(t *testing.T) {
 	input := strings.TrimSpace(`
-		This is a test that has multiple paragraphs.
+		This is a   test that   has multiple paragraphs.
 
-		See? This is technically the third paragraph because of the empty line.
+		See? This is technically  the third  paragraph because of the empty line.
 	`)
 
 	actualRichStrings := renderContent(

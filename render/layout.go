@@ -9,6 +9,10 @@ import (
 
 // Rendering of an individual cell, given a RichString.
 // Output is an array of RichString rows.
+//
+// NOTE: This will destroy the input string. Most of the layout work is done
+// in-place, including space compaction and trimming. That reduces allocations
+// and copies, but it will garble the input argument.
 func renderCell(content rich.RichString, sizedCell *SizedCell) []rich.RichString {
 	return renderContent(
 		content,
@@ -57,7 +61,10 @@ func normalizeWhitespace(content rich.RichString) rich.RichString {
 		// this defends against bugs later.
 		return rich.RichString{}
 	}
-	result := make(rich.RichString, 0, len(content))
+
+	// Make in place by writing back to the original array. Since len(result) <=
+	// len(content), this will never have to resize
+	result := content[:0]
 	// Consider the string to be left-extended with spaces; we trim leading and
 	// trailing space.
 	wasSpace := true
