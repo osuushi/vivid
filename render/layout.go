@@ -9,11 +9,18 @@ import (
 
 // Rendering of an individual cell, given a RichString.
 // Output is an array of RichString rows.
-func renderCell(sizedCell *SizedCell, content rich.RichString) []rich.RichString {
-	width := sizedCell.Width
-	cell := sizedCell.Cell
+func renderCell(content rich.RichString, sizedCell *SizedCell) []rich.RichString {
+	return renderContent(
+		content,
+		sizedCell.Width,
+		sizedCell.Cell.Wrap,
+		sizedCell.Cell.Alignment,
+	)
+}
+
+func renderContent(content rich.RichString, width int, wrap bool, alignment Alignment) []rich.RichString {
 	paragraphs := content.Split("\n")
-	if !cell.Wrap {
+	if !wrap {
 		// Use only the first pargraph and truncate it
 		paragraphs = []rich.RichString{
 			truncateContentToWidth(paragraphs[0], width),
@@ -22,7 +29,7 @@ func renderCell(sizedCell *SizedCell, content rich.RichString) []rich.RichString
 	rows := []rich.RichString{}
 	for _, p := range paragraphs {
 		paragraphRows := sliceParagraph(p, width)
-		alignParagraphRows(paragraphRows, cell.Alignment, width)
+		alignParagraphRows(paragraphRows, alignment, width)
 		rows = append(rows, paragraphRows...)
 	}
 
