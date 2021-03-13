@@ -136,6 +136,9 @@ func alignParagraphRows(rows []rich.RichString, alignment Alignment, width int) 
 }
 
 func alignRow(row rich.RichString, alignment Alignment, width int) rich.RichString {
+	// Copy the row, since up to this point, we will have used slices to avoid
+	// copies
+	row = append(rich.RichString{}, row...)
 	switch alignment {
 	case Left:
 		return append(row, makeSpacer(width-len(row))...)
