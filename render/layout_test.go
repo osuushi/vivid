@@ -120,3 +120,18 @@ func TestNormalizeWhitespace(t *testing.T) {
 	check("this has trailing spaces   ", "this has trailing spaces")
 	check("\t  this is \t   \t lousy \t \t with tabs", "this is lousy with tabs")
 }
+
+func TestTruncateContentToWidth(t *testing.T) {
+	check := func(input string, width int, expected string) {
+		actual := truncateContentToWidth(rich.NewRichString(input, nil), width).String()
+		if actual != expected {
+			t.Errorf("Expected %q, got %q", expected, actual)
+		}
+	}
+
+	check("This is a test", 1, "…")
+	check("This is a test", 2, "T…")
+	check("This is a test", 7, "This i…")
+	check("This is a test", 13, "This is a te…")
+	check("This is a test", 14, "This is a test")
+}
