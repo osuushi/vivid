@@ -108,7 +108,7 @@ func scanNextLine(input rich.RichString, width int) (rich.RichString, rich.RichS
 
 	lastSpaceIndex := -1
 	for i, r := range input {
-		if i >= width { // We hit the max line length
+		if i > width { // We hit the max line length
 			if lastSpaceIndex > 0 { // Normal case where we have a space to split at
 				return input[:lastSpaceIndex], input[lastSpaceIndex:]
 			} else { // A single word has occupied the entire line

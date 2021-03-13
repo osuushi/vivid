@@ -82,11 +82,18 @@ func TestSliceParagraph(t *testing.T) {
 		}
 	}
 
-	check(30, []string{
+	check(27, []string{
 		"This is a test of paragraph",
+		"slicing. Here's a long",
+		"word:",
+		"\"antidisestablishmentarianis",
+		"m\". Wow. What a mouthful.",
+	})
+
+	check(30, []string{"This is a test of paragraph",
 		"slicing. Here's a long word:",
-		"\"antidisestablishmentarianism\"",
-		". Wow. What a mouthful.",
+		"\"antidisestablishmentarianism\".",
+		"Wow. What a mouthful.",
 	})
 
 	check(40, []string{
