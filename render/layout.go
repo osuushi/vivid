@@ -24,10 +24,12 @@ func renderCell(content rich.RichString, sizedCell *SizedCell) []rich.RichString
 
 func renderContent(content rich.RichString, width int, wrap bool, alignment Alignment) []rich.RichString {
 	paragraphs := content.Split("\n")
+	paragraphs = trimEmptyParagraphs(paragraphs)
 	if !wrap {
 		// Use only the first pargraph and truncate it
+		line := normalizeWhitespace(rich.Concat(paragraphs...))
 		paragraphs = []rich.RichString{
-			truncateContentToWidth(paragraphs[0], width),
+			truncateContentToWidth(line, width),
 		}
 	}
 	rows := []rich.RichString{}
@@ -38,6 +40,23 @@ func renderContent(content rich.RichString, width int, wrap bool, alignment Alig
 	}
 
 	return rows
+}
+
+func trimEmptyParagraphs(paragraphs []rich.RichString) []rich.RichString {
+	for len(paragraphs) > 1 && isAllWhiteSpace(paragraphs[0]) {
+		paragraphs = paragraphs[1:]
+	}
+
+	return paragraphs
+}
+
+func isAllWhiteSpace(line rich.RichString) bool {
+	for _, r := range line {
+		if !unicode.IsSpace(r.Rune) {
+			return false
+		}
+	}
+	return true
 }
 
 func truncateContentToWidth(content rich.RichString, width int) rich.RichString {

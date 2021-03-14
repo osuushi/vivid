@@ -82,7 +82,7 @@ func TestRender(t *testing.T) {
 
 	check(
 		"@wrap@justify@fixed20[@-columns.0] @wrap@fixed15[@-columns.1] @bold[@-columns.2]",
-		"This   is   a   test This column     𝗕T𝗕h𝗕i𝗕s𝗕 𝗕l𝗕i𝗕n𝗕e𝗕 𝗕i𝗕… ",
+		"This   is   a   test This column     𝗕T𝗕h𝗕i𝗕s𝗕 𝗕l𝗕i𝗕n𝗕e𝗕 𝗕i𝗕s𝗕…",
 		"column.              only wraps but               ",
 		"                     has no                       ",
 		"It    has   multiple paragraphs.                  ",
