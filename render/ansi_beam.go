@@ -79,6 +79,7 @@ func (beam *ANSIBeam) ScanRune(r rich.RichRune, b *strings.Builder) {
 }
 
 func (beam *ANSIBeam) Terminate(b *strings.Builder) {
+	beam.currentStyle = realizedStyle{}
 	beam.writeSGR(SGRReset, b)
 	beam.endSGRIfNeeded(b)
 }

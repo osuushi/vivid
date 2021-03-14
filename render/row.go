@@ -68,9 +68,8 @@ func (row *Row) Render(width int, beam StyleBeam, context interface{}) ([]string
 		if i > 0 {
 			spacerWidth++ // account for left pad
 		}
-		spacer := rich.MakeSpacer(spacerWidth, &rich.Style{
-			Background: sc.Cell.Background,
-		})
+
+		spacer := rich.MakeSpacer(spacerWidth, nil)
 
 		for j := 0; j < spacerCount; j++ {
 			cellLines[i] = append(cellLines[i], spacer)
@@ -84,9 +83,24 @@ func (row *Row) Render(width int, beam StyleBeam, context interface{}) ([]string
 		var builder strings.Builder
 
 		// Get the current line from each cell line group
-		for _, lines := range cellLines {
+		for j, lines := range cellLines {
 			line := lines[i]
+
+			// We have to add the cell background to each rune's style. Since styles tend
+			// to come in runs, we can cache the last one and only create new ones when
+			// the underlying style changes
+			var lastRuneStyle *rich.Style = &rich.Style{} // dummy style
+			var backgroundAddedStyle *rich.Style
+
 			for _, r := range line {
+				if r.Style != lastRuneStyle {
+					backgroundAddedStyle = &rich.Style{
+						Background: sizedCells[j].Cell.Background,
+						Parent:     r.Style,
+					}
+					lastRuneStyle = r.Style
+				}
+				r.Style = backgroundAddedStyle
 				beam.ScanRune(r, &builder)
 			}
 		}

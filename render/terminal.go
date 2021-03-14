@@ -2,7 +2,11 @@
 
 package render
 
-import "os"
+import (
+	"os"
+
+	"github.com/olekukonko/ts"
+)
 
 func DefaultBeam() StyleBeam {
 	if !isTTY() {
@@ -11,6 +15,19 @@ func DefaultBeam() StyleBeam {
 	ansiBeam := &ANSIBeam{}
 	ansiBeam.UseColor = supportsTrueColor()
 	return ansiBeam
+}
+
+func TerminalWidth() (int, error) {
+	if !isTTY() {
+		// TODO: Need a better choice for this
+		return 250, nil
+	}
+	size, err := ts.GetSize()
+	if err != nil {
+		return 0, err
+	}
+
+	return size.Col(), nil
 }
 
 func isTTY() bool {

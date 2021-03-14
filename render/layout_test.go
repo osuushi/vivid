@@ -137,6 +137,16 @@ func TestScanNextLine(t *testing.T) {
 	line, input = scanNextLine(input, 8)
 	check(line, "ly")
 	check(input, "")
+
+	// regression test
+	input = rich.NewRichString("Fighting, Psychic", nil)
+	line, input = scanNextLine(input, 16)
+	check(line, "Fighting,")
+	check(input, " Psychic")
+
+	line, input = scanNextLine(input, 16)
+	check(line, "Psychic")
+	check(input, "")
 }
 
 func TestNormalizeWhitespace(t *testing.T) {
