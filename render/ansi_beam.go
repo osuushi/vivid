@@ -118,7 +118,6 @@ func (beam *ANSIBeam) writeSGRColor(background bool, color *rich.RGB, b *strings
 		prefix = SGRBgColor
 	}
 
-	b.WriteString(CSI)
 	b.WriteString(prefix)
 	b.WriteString(strconv.Itoa(int(color.R)))
 	b.WriteRune(';')
