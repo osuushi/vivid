@@ -22,4 +22,4 @@ func (beam *PlainBeam) ScanRune(r rich.RichRune, b *strings.Builder) {
 }
 
 // Nothing has to be done to terminate with the plain beam
-func (beam *PlainBeam) Terminate(b *strings.Builder) {}
+func (beam *PlainBeam) Terminate(*strings.Builder) {}

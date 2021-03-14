@@ -37,7 +37,7 @@ func makeRowFromAst(ast *vivian.Ast) (*Row, error) {
 }
 
 // Context must be a generic structure, either []interface{} or
-// map[string]interface{}, and all values must be either primitives, or more
+// map[interface{}]interface{}, and all values must be either primitives, or more
 // of the same.
 //
 // Returns an array of lines, which are ANSI styled strings
@@ -72,7 +72,11 @@ func (row *Row) Render(width int, beam StyleBeam, context interface{}) ([]string
 		}
 
 		sc := sizedCells[i]
-		spacer := rich.MakeSpacer(sc.Width, &rich.Style{
+		spacerWidth := sc.Width
+		if i > 0 {
+			spacerWidth++ // account for left pad
+		}
+		spacer := rich.MakeSpacer(spacerWidth, &rich.Style{
 			Background: sc.Cell.Background,
 		})
 

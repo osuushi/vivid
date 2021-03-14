@@ -6,27 +6,30 @@ type RichRune struct {
 }
 
 func (r *RichRune) GetColor() *RGB {
-	return r.Style.GetColor()
+	return r.GetStyle().GetColor()
 }
 
 func (r *RichRune) GetBackground() *RGB {
-	return r.Style.GetBackground()
+	return r.GetStyle().GetBackground()
 }
 
 func (r *RichRune) IsBold() bool {
-	return r.Style.IsBold()
+	return r.GetStyle().IsBold()
 }
 
 func (r *RichRune) IsItalic() bool {
-	return r.Style.IsItalic()
+	return r.GetStyle().IsItalic()
 }
 
 func (r *RichRune) IsUnderline() bool {
-	return r.Style.IsUnderline()
+	return r.GetStyle().IsUnderline()
 }
 
 // Return a copy of the rune's style
 func (r *RichRune) GetStyle() *Style {
-	styleStruct := *r.Style
+	styleStruct := *rootStyle
+	if r.Style != nil {
+		styleStruct = *r.Style
+	}
 	return &styleStruct
 }
