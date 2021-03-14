@@ -126,7 +126,7 @@ func TestRender(t *testing.T) {
 		"paragraphs.         ",
 	)
 
-	// Now the strut is glued, so it gets deleted
+	// Now the last column has no max, so it expands.
 	check(
 		"@wrap@shy@justify@fixed40[@-columns.0] @strut@glue[] @wrap@min20[@-columns.1]",
 		"This column only wraps but has no paragraphs.     ",
