@@ -52,3 +52,19 @@ func RGBFromHex(hex string) (*RGB, bool) {
 	result.R = uint8(val & 0xff)
 	return result, true
 }
+
+func (self *RGB) Equals(other *RGB) bool {
+	if other == nil {
+		return false
+	}
+	return self.R == other.R &&
+		self.G == other.G &&
+		self.B == other.B
+}
+
+func RGBEqual(a, b *RGB) bool {
+	if a == nil {
+		return b == nil
+	}
+	return a.Equals(b)
+}
