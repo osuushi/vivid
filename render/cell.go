@@ -179,8 +179,10 @@ func applyTag(tag string, cell *Cell) error {
 	case "wrap":
 		cell.Wrap = true
 		// Number parameter is shorthand for @wrap@fixedNN
-		cell.MinWidth = param
-		cell.MaxWidth = param
+		if param != 0 {
+			cell.MinWidth = param
+			cell.MaxWidth = param
+		}
 	case "strut":
 		cell.Greedy = true
 	case "shy":

@@ -125,4 +125,10 @@ func TestRender(t *testing.T) {
 		"wraps but has no    ",
 		"paragraphs.         ",
 	)
+
+	// Now the strut is glued, so it gets deleted
+	check(
+		"@wrap@shy@justify@fixed40[@-columns.0] @strut@glue[] @wrap@min20[@-columns.1]",
+		"This column only wraps but has no paragraphs.     ",
+	)
 }

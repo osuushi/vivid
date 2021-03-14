@@ -127,6 +127,12 @@ func TestExpandCells(t *testing.T) {
 		}
 	}
 
+	// One cell by its lonesome
+	check(
+		"@min30[]",
+		true, 150,
+	)
+
 	// Remember that there is one space for padding between cells
 	check(
 		"@fixed30[] @min40@strut[]",
