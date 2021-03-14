@@ -10,7 +10,7 @@ type RichString []RichRune
 // string.
 func NewRichString(str string, style *Style) RichString {
 	if style == nil {
-		style = rootStyle
+		style = RootStyle
 	}
 
 	runes := []rune(str)

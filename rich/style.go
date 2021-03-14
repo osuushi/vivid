@@ -15,7 +15,7 @@ type Style struct {
 	Parent                  *Style // if nil, the root Style is implied
 }
 
-var rootStyle = &Style{
+var RootStyle = &Style{
 	// Note that "nil" has a special meaning for colors in the root style. A nil
 	// color in any non-root style will mean "inherit", but a nil style in the
 	// root will use the "normal" color provided by the reset escape sequence.
@@ -28,11 +28,11 @@ var rootStyle = &Style{
 }
 
 func (s *Style) getParent() *Style {
-	if s == rootStyle {
+	if s == RootStyle {
 		panic("Tried to access parent of root style")
 	}
 	if s.Parent == nil {
-		return rootStyle
+		return RootStyle
 	} else {
 		return s.Parent
 	}
@@ -42,7 +42,7 @@ func (s *Style) getParent() *Style {
 func (s *Style) inheritColor(get func(s *Style) *RGB) *RGB {
 	if val := get(s); val != nil {
 		return val
-	} else if s == rootStyle {
+	} else if s == RootStyle {
 		// nil is actually allowed in root style, albeit with a different meaning.
 		return nil
 	} else {
@@ -88,7 +88,7 @@ func (s *Style) IsUnderline() bool {
 
 // Inject newRoot at the root, creating a new style
 func (s *Style) Rebase(newRoot *Style) *Style {
-	if s == rootStyle || s == nil {
+	if s == RootStyle || s == nil {
 		return newRoot
 	}
 

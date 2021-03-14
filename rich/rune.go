@@ -27,7 +27,7 @@ func (r *RichRune) IsUnderline() bool {
 
 // Return a copy of the rune's style
 func (r *RichRune) GetStyle() *Style {
-	styleStruct := *rootStyle
+	styleStruct := *RootStyle
 	if r.Style != nil {
 		styleStruct = *r.Style
 	}
