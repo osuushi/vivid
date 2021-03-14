@@ -48,9 +48,9 @@ func (beam *ANSIBeam) ScanRune(r rich.RichRune, b *strings.Builder) {
 	if isUnderline := newStyle.IsUnderline(); isUnderline != oldStyle.Underline {
 		oldStyle.Underline = isUnderline
 		if isUnderline {
-			beam.writeSGR(SGRItalic, b)
+			beam.writeSGR(SGRUnderline, b)
 		} else {
-			beam.writeSGR(SGRNotItalic, b)
+			beam.writeSGR(SGRNotUnderline, b)
 		}
 	}
 
