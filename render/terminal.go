@@ -4,8 +4,9 @@ package render
 
 import (
 	"os"
-
-	"github.com/olekukonko/ts"
+	"os/exec"
+	"strconv"
+	"strings"
 )
 
 func DefaultBeam() StyleBeam {
@@ -13,26 +14,38 @@ func DefaultBeam() StyleBeam {
 		return &PlainBeam{}
 	}
 	ansiBeam := &ANSIBeam{}
-	ansiBeam.UseColor = supportsTrueColor()
+	ansiBeam.UseColor = supports256Color()
+	ansiBeam.TrueColor = supportsTrueColor()
 	return ansiBeam
 }
 
 func TerminalWidth() (int, error) {
-	if !isTTY() {
-		// TODO: Need a better choice for this
-		return 250, nil
-	}
-	size, err := ts.GetSize()
+	tputAnswer, err := tput("cols")
 	if err != nil {
 		return 0, err
 	}
+	return strconv.Atoi(tputAnswer)
+}
 
-	return size.Col(), nil
+func tput(arg string) (string, error) {
+	result, err := exec.Command("tput", arg).Output()
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(string(result)), nil
 }
 
 func isTTY() bool {
 	fileInfo, _ := os.Stdout.Stat()
 	return (fileInfo.Mode() & os.ModeCharDevice) != 0
+}
+
+func supports256Color() bool {
+	tputAnswer, err := tput("colors")
+	if err != nil {
+		return false
+	}
+	return tputAnswer == "256"
 }
 
 func supportsTrueColor() bool {

@@ -4,13 +4,15 @@ import (
 	"strconv"
 	"strings"
 
+	gookitColor "github.com/gookit/color"
 	"github.com/osuushi/vivid/rich"
 )
 
 // StyleBeam which converts to ANSI formatting (24-bit color)
 
 type ANSIBeam struct {
-	UseColor bool
+	UseColor  bool
+	TrueColor bool
 	// Track the style we're currently rendering so we know which new escape codes
 	// need to be emitted
 	currentStyle realizedStyle
@@ -109,13 +111,21 @@ func (beam *ANSIBeam) writeSGR(sequence string, b *strings.Builder) {
 	b.WriteString(sequence)
 }
 
-// True-color ansi code from RGB
 func (beam *ANSIBeam) writeSGRColor(background bool, color *rich.RGB, b *strings.Builder) {
+	if beam.TrueColor {
+		beam.writeSGRTrueColor(background, color, b)
+	} else {
+		beam.writeSGR256Color(background, color, b)
+	}
+}
+
+// True-color ansi code from RGB
+func (beam *ANSIBeam) writeSGRTrueColor(background bool, color *rich.RGB, b *strings.Builder) {
 	beam.beginSGRIfNeeded(b)
 
-	prefix := SGRFgColor
+	prefix := SGRFgTrueColor
 	if background {
-		prefix = SGRBgColor
+		prefix = SGRBgTrueColor
 	}
 
 	b.WriteString(prefix)
@@ -124,4 +134,16 @@ func (beam *ANSIBeam) writeSGRColor(background bool, color *rich.RGB, b *strings
 	b.WriteString(strconv.Itoa(int(color.G)))
 	b.WriteRune(';')
 	b.WriteString(strconv.Itoa(int(color.B)))
+}
+
+func (beam *ANSIBeam) writeSGR256Color(background bool, color *rich.RGB, b *strings.Builder) {
+	beam.beginSGRIfNeeded(b)
+	code := gookitColor.Rgb2short(color.R, color.G, color.B)
+
+	prefix := SGRFg256Color
+	if background {
+		prefix = SGRBg256Color
+	}
+	b.WriteString(prefix)
+	b.WriteString(strconv.Itoa(int(code)))
 }
