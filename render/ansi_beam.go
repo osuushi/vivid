@@ -13,19 +13,22 @@ type ANSIBeam struct {
 	UseColor bool
 	// Track the style we're currently rendering so we know which new escape codes
 	// need to be emitted
-	currentStyle *rich.Style
+	currentStyle realizedStyle
 	insideSGR    bool
+}
+
+type realizedStyle struct {
+	Color, Background       *rich.RGB
+	Bold, Italic, Underline bool
 }
 
 func (beam *ANSIBeam) ScanRune(r rich.RichRune, b *strings.Builder) {
 	newStyle := r.GetStyle()
-	oldStyle := beam.currentStyle
-	if oldStyle == nil {
-		oldStyle = rich.RootStyle
-	}
+	oldStyle := &beam.currentStyle
 
 	// Compare styles
-	if isBold := newStyle.IsBold(); isBold != oldStyle.IsBold() {
+	if isBold := newStyle.IsBold(); isBold != oldStyle.Bold {
+		oldStyle.Bold = isBold
 		if isBold {
 			beam.writeSGR(SGRBold, b)
 		} else {
@@ -33,7 +36,8 @@ func (beam *ANSIBeam) ScanRune(r rich.RichRune, b *strings.Builder) {
 		}
 	}
 
-	if isItalic := newStyle.IsItalic(); isItalic != oldStyle.IsItalic() {
+	if isItalic := newStyle.IsItalic(); isItalic != oldStyle.Italic {
+		oldStyle.Italic = isItalic
 		if isItalic {
 			beam.writeSGR(SGRItalic, b)
 		} else {
@@ -41,7 +45,8 @@ func (beam *ANSIBeam) ScanRune(r rich.RichRune, b *strings.Builder) {
 		}
 	}
 
-	if isUnderline := newStyle.IsUnderline(); isUnderline != oldStyle.IsUnderline() {
+	if isUnderline := newStyle.IsUnderline(); isUnderline != oldStyle.Underline {
+		oldStyle.Underline = isUnderline
 		if isUnderline {
 			beam.writeSGR(SGRItalic, b)
 		} else {
@@ -50,7 +55,8 @@ func (beam *ANSIBeam) ScanRune(r rich.RichRune, b *strings.Builder) {
 	}
 
 	if beam.UseColor {
-		if fgColor := newStyle.GetColor(); !rich.RGBEqual(fgColor, oldStyle.GetColor()) {
+		if fgColor := newStyle.GetColor(); !rich.RGBEqual(fgColor, oldStyle.Color) {
+			oldStyle.Color = fgColor
 			if fgColor == nil {
 				beam.writeSGR(SGRFgReset, b)
 			} else {
@@ -58,7 +64,8 @@ func (beam *ANSIBeam) ScanRune(r rich.RichRune, b *strings.Builder) {
 			}
 		}
 
-		if bgColor := newStyle.GetBackground(); !rich.RGBEqual(bgColor, oldStyle.GetBackground()) {
+		if bgColor := newStyle.GetBackground(); !rich.RGBEqual(bgColor, oldStyle.Background) {
+			oldStyle.Background = bgColor
 			if bgColor == nil {
 				beam.writeSGR(SGRBgReset, b)
 			} else {
