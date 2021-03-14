@@ -34,8 +34,16 @@ func accessContextWithComponents(context interface{}, components []string) inter
 	components = components[1:]
 
 	switch context := context.(type) {
+	case map[string]interface{}:
+		return accessContextWithComponents(
+			context[firstComponent],
+			components,
+		)
 	case map[interface{}]interface{}:
-		return accessContextWithComponents(context[firstComponent], components)
+		return accessContextWithComponents(
+			context[firstComponent],
+			components,
+		)
 	case []interface{}:
 		if firstComponent == "length" {
 			return accessContextWithComponents(len(context), components)
