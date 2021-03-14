@@ -126,7 +126,9 @@ func scanNextLine(input rich.RichString, width int) (rich.RichString, rich.RichS
 			if lastSpaceIndex > 0 { // Normal case where we have a space to split at
 				return input[:lastSpaceIndex], input[lastSpaceIndex:]
 			} else { // A single word has occupied the entire line
-				return input[:i], input[i:]
+				// Backtrack, since we have actually extended past the line by one
+				// character.
+				return input[:i-1], input[i-1:]
 			}
 		}
 

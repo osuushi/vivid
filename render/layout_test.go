@@ -69,14 +69,14 @@ func TestSliceParagraph(t *testing.T) {
 		"This is a test of paragraph",
 		"slicing. Here's a long",
 		"word:",
-		"\"antidisestablishmentarianis",
-		"m\". Wow. What a mouthful.",
+		"\"antidisestablishmentariani",
+		"sm\". Wow. What a mouthful.",
 	})
 
 	check(30, []string{"This is a test of paragraph",
 		"slicing. Here's a long word:",
-		"\"antidisestablishmentarianism\".",
-		"Wow. What a mouthful.",
+		"\"antidisestablishmentarianism\"",
+		". Wow. What a mouthful.",
 	})
 
 	check(40, []string{
@@ -90,6 +90,53 @@ func TestSliceParagraph(t *testing.T) {
 		"This is a test of paragraph slicing. Here's a long word:",
 		"\"antidisestablishmentarianism\". Wow. What a mouthful.",
 	})
+}
+
+func TestScanNextLine(t *testing.T) {
+	check := func(actual rich.RichString, expected string) {
+		if expected == "" {
+			if actual != nil {
+				t.Errorf("Expected nil for last remainder, not %s", actual.String())
+			}
+		}
+
+		actualString := actual.String()
+		if actualString != expected {
+			// These tests are backward-dependent, so we can't keep going with this
+			// test after a failure.
+			t.Fatalf("\nExpected: %q\nGot:%q", expected, actual)
+		}
+	}
+	input := rich.NewRichString("It has multiple paragraphs and wraps repeatedly", nil)
+	var line rich.RichString
+
+	line, input = scanNextLine(input, 8)
+	check(line, "It has")
+	check(input, " multiple paragraphs and wraps repeatedly")
+
+	line, input = scanNextLine(input, 8)
+	check(line, "multiple")
+	check(input, " paragraphs and wraps repeatedly")
+
+	line, input = scanNextLine(input, 8)
+	check(line, "paragrap")
+	check(input, "hs and wraps repeatedly")
+
+	line, input = scanNextLine(input, 8)
+	check(line, "hs and")
+	check(input, " wraps repeatedly")
+
+	line, input = scanNextLine(input, 8)
+	check(line, "wraps")
+	check(input, " repeatedly")
+
+	line, input = scanNextLine(input, 8)
+	check(line, "repeated")
+	check(input, "ly")
+
+	line, input = scanNextLine(input, 8)
+	check(line, "ly")
+	check(input, "")
 }
 
 func TestNormalizeWhitespace(t *testing.T) {
