@@ -45,25 +45,32 @@ func main() {
 	beam := render.DefaultBeam()
 
 	start := time.Now()
-	template, err := render.MakeRow(os.Args[2])
-	if err != nil {
-		panic(err)
+	templates := []*render.Row{}
+	for _, arg := range os.Args[2:] {
+		template, err := render.MakeRow(arg)
+		templates = append(templates, template)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	elapsed := time.Since(start)
 	start = time.Now()
 
 	for _, context := range contexts {
-		rows, err := template.Render(width, beam, context)
-		if err != nil {
-			panic(err)
+		for _, template := range templates {
+			rows, err := template.Render(width, beam, context)
+			if err != nil {
+				panic(err)
+			}
+
+			// Don't measure actual stdout time
+			elapsed += time.Since(start)
+			for _, row := range rows {
+				fmt.Println(row)
+			}
+			start = time.Now()
 		}
-		// Don't measure actual stdout time
-		elapsed += time.Since(start)
-		for _, row := range rows {
-			fmt.Println(row)
-		}
-		start = time.Now()
 	}
 
 	if err != nil {
