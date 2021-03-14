@@ -115,3 +115,11 @@ func (rs RichString) Append(s string) RichString {
 
 	return Concat(rs, NewRichString(s, rs[len(rs)-1].Style))
 }
+
+func MakeSpacer(width int, style *Style) RichString {
+	result := make(RichString, width)
+	for i := range result {
+		result[i] = RichRune{Rune: ' ', Style: style}
+	}
+	return result
+}

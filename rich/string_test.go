@@ -74,3 +74,21 @@ func TestConcat(t *testing.T) {
 		t.Error(diff)
 	}
 }
+
+func TestMakeSpacer(t *testing.T) {
+	var actual string
+	actual = MakeSpacer(0, nil).String()
+	if actual != "" {
+		t.Errorf("Unexpected output for length 0: %q", actual)
+	}
+
+	actual = MakeSpacer(1, nil).String()
+	if actual != " " {
+		t.Errorf("Unexpected output for length 1: %q", actual)
+	}
+
+	actual = MakeSpacer(2, nil).String()
+	if actual != "  " {
+		t.Errorf("Unexpected output for length 2: %q", actual)
+	}
+}

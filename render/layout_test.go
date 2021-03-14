@@ -48,24 +48,6 @@ func TestAlignRow(t *testing.T) {
 	check(39, Justify, "justify", "Whan that aprill with his shoures soote")
 }
 
-func TestMakeSpacer(t *testing.T) {
-	var actual string
-	actual = makeSpacer(0).String()
-	if actual != "" {
-		t.Errorf("Unexpected output for length 0: %q", actual)
-	}
-
-	actual = makeSpacer(1).String()
-	if actual != " " {
-		t.Errorf("Unexpected output for length 1: %q", actual)
-	}
-
-	actual = makeSpacer(2).String()
-	if actual != "  " {
-		t.Errorf("Unexpected output for length 2: %q", actual)
-	}
-}
-
 var testParagraph = "This   is\ta test of paragraph slicing. Here's a long word: \"antidisestablishmentarianism\". Wow. What a mouthful."
 
 func TestSliceParagraph(t *testing.T) {

@@ -157,27 +157,19 @@ func alignRow(row rich.RichString, alignment Alignment, width int) rich.RichStri
 	row = append(rich.RichString{}, row...)
 	switch alignment {
 	case Left:
-		return append(row, makeSpacer(width-len(row))...)
+		return append(row, rich.MakeSpacer(width-len(row), nil)...)
 	case Right:
-		return append(makeSpacer(width-len(row)), row...)
+		return append(rich.MakeSpacer(width-len(row), nil), row...)
 	case Center:
 		freeSpace := width - len(row)
 		leftSide := freeSpace / 2
-		row = append(makeSpacer(leftSide), row...)
+		row = append(rich.MakeSpacer(leftSide, nil), row...)
 		rightSide := freeSpace - leftSide
-		return append(row, makeSpacer(rightSide)...)
+		return append(row, rich.MakeSpacer(rightSide, nil)...)
 	case Justify:
 		return justifyLine(row, width)
 	}
 	panic(fmt.Sprintf("Unknown alignment: %v", alignment))
-}
-
-func makeSpacer(width int) rich.RichString {
-	result := make(rich.RichString, width)
-	for i := range result {
-		result[i] = rich.RichRune{Rune: ' '}
-	}
-	return result
 }
 
 // Justify a line of text. This assumes that it is not the last line in a
@@ -207,7 +199,7 @@ func justifyLine(line rich.RichString, width int) rich.RichString {
 	for _, r := range line {
 		if r.Rune == ' ' {
 			// Place a spacer
-			result = append(result, makeSpacer(allocator())...)
+			result = append(result, rich.MakeSpacer(allocator(), nil)...)
 		} else {
 			result = append(result, r)
 		}
