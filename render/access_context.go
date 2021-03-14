@@ -7,16 +7,22 @@ import (
 	"github.com/spf13/cast"
 )
 
-// Access the data in an arbitrary map/slice structure by a dot separated path.
+// Access the data in an arbitrary map/slice structure by a path.
 // Arrays are treated exactly as if they were objects with numeric strings for
 // keys and a `length` property.
 //
 // Output is always cast to a string. If a value is missing or not
 // stringifyable, an empty string is returned.
 
-func accessContext(context interface{}, path string) string {
-	pathComponents := strings.Split(path, ".")
-	result := accessContextWithComponents(context, pathComponents)
+func accessContext(context interface{}, components []string) string {
+	result := accessContextWithComponents(context, components)
+	if array, ok := result.([]interface{}); ok {
+		stringified := make([]string, len(array))
+		for i, val := range array {
+			stringified[i] = cast.ToString(val)
+		}
+		return strings.Join(stringified, ", ")
+	}
 	return cast.ToString(result)
 }
 

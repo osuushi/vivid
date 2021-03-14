@@ -20,7 +20,7 @@ type ANSIBeam struct {
 func (beam *ANSIBeam) ScanRune(r rich.RichRune, b *strings.Builder) {
 	newStyle := r.GetStyle()
 	oldStyle := beam.currentStyle
-	if oldStyle != nil {
+	if oldStyle == nil {
 		oldStyle = rich.RootStyle
 	}
 

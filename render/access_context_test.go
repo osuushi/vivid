@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-yaml/yaml"
+	"gopkg.in/yaml.v3"
 )
 
 const example = `
@@ -32,7 +32,7 @@ func parseYaml(data string) interface{} {
 }
 
 func TestAccessContext(t *testing.T) {
-	check := func(data interface{}, path string, expected string) {
+	check := func(data interface{}, path []string, expected string) {
 		actual := accessContext(data, path)
 		if actual != expected {
 			t.Errorf("For %q, expected %q but got %q", path, expected, actual)
@@ -41,10 +41,10 @@ func TestAccessContext(t *testing.T) {
 
 	input := parseYaml(example)
 	fmt.Println("Using example:", example)
-	check(input, "0.foo.bar", "2")
-	check(input, "0.foo.bar.bad", "")
-	check(input, "0.baz.1", "3")
-	check(input, "0.baz.length", "2")
-	check(input, "length", "2")
-	check(input, "1.gribble.0.gralt", "42")
+	check(input, []string{"0", "foo", "bar"}, "2")
+	check(input, []string{"0", "foo", "bar", "bad"}, "")
+	check(input, []string{"0", "baz", "1"}, "3")
+	check(input, []string{"0", "baz", "length"}, "2")
+	check(input, []string{"length"}, "2")
+	check(input, []string{"1", "gribble", "0", "gralt"}, "42")
 }

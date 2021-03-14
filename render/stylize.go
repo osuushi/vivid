@@ -36,7 +36,7 @@ func stylizeNode(node vivian.Node, context interface{}, style *rich.Style) (rich
 		}
 		return stylizeNodes(node.Children, context, newStyle)
 	case *vivian.InputNode:
-		val := cast.ToString(accessContextWithComponents(context, node.Path))
+		val := cast.ToString(accessContext(context, node.Path))
 		return rich.NewRichString(val, style), nil
 	case *vivian.TextNode:
 		return rich.NewRichString(node.Text, style), nil
