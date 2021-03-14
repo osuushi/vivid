@@ -2,7 +2,6 @@ package render
 
 import (
 	"strings"
-	"sync"
 
 	"github.com/osuushi/vivid/rich"
 	"github.com/osuushi/vivid/vivian"
@@ -45,18 +44,11 @@ func (row *Row) Render(width int, beam StyleBeam, context interface{}) ([]string
 	sizedCells := AllocateCellSizes(row.Cells, width)
 	cellLines := make([][]rich.RichString, len(sizedCells))
 
-	var wg sync.WaitGroup
-	wg.Add(len(sizedCells))
-	errCh := make(chan error)
 	for i, sc := range sizedCells {
-		go layoutAndStyleCell(sc, i > 0, context, &cellLines[i], &wg, errCh)
-	}
-	wg.Wait()
-	// Read any error
-	select {
-	case err := <-errCh:
-		return nil, err
-	default:
+		err := layoutAndStyleCell(sc, i > 0, context, &cellLines[i])
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// Pad all cells to tallest
@@ -110,22 +102,13 @@ func layoutAndStyleCell(
 	leftPad bool,
 	context interface{},
 	dest *[]rich.RichString,
-	wg *sync.WaitGroup,
-	errCh chan error,
-) {
-	defer wg.Done()
+) error {
 	cellStyle := &rich.Style{
 		Background: sc.Cell.Background,
 	}
 	content, err := stylizeNodes(sc.Cell.Content, context, cellStyle)
 	if err != nil {
-		// Try to send the error over the channel, but give up if it's blocked
-		// (which means another goroutine send an error already)
-		select {
-		case errCh <- err:
-		default:
-		}
-		return
+		return err
 	}
 
 	lines := renderCell(content, sc)
@@ -139,4 +122,5 @@ func layoutAndStyleCell(
 		}
 	}
 	*dest = lines
+	return nil
 }

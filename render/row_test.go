@@ -131,4 +131,21 @@ func TestRender(t *testing.T) {
 		"@wrap@shy@justify@fixed40[@-columns.0] @strut@glue[] @wrap@min20[@-columns.1]",
 		"This column only wraps but has no paragraphs.     ",
 	)
+
+	// Small stress test
+	check(
+		"@wrap[@-columns.0] @wrap[@-columns.0] @wrap[@-columns.0] @wrap[@-columns.0] @wrap[@-columns.0] @wrap[@-columns.0]",
+		"This is  This is This is  This is This is  This is",
+		"a test   a test  a test   a test  a test   a test ",
+		"column.  column. column.  column. column.  column.",
+		"                                                  ",
+		"It has   It has  It has   It has  It has   It has ",
+		"multiple multipl multiple multipl multiple multipl",
+		"paragrap e       paragrap e       paragrap e      ",
+		"hs and   paragra hs and   paragra hs and   paragra",
+		"wraps    phs and wraps    phs and wraps    phs and",
+		"repeated wraps   repeated wraps   repeated wraps  ",
+		"ly       repeate ly       repeate ly       repeate",
+		"         dly              dly              dly    ",
+	)
 }
