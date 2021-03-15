@@ -52,29 +52,8 @@ func (row *Row) Render(width int, beam StyleBeam, context interface{}) ([]string
 	}
 
 	// Pad all cells to tallest
-	maxHeight := 0
-	for _, lines := range cellLines {
-		maxHeight = intgr.Max(maxHeight, len(lines))
-	}
-
-	for i, lines := range cellLines {
-		spacerCount := maxHeight - len(lines)
-		if spacerCount == 0 {
-			continue
-		}
-
-		sc := sizedCells[i]
-		spacerWidth := sc.Width
-		if i > 0 {
-			spacerWidth++ // account for left pad
-		}
-
-		spacer := rich.MakeSpacer(spacerWidth, nil)
-
-		for j := 0; j < spacerCount; j++ {
-			cellLines[i] = append(cellLines[i], spacer)
-		}
-	}
+	maxHeight := row.getMaxHeight(cellLines)
+	row.padCellLinesToHeight(cellLines, maxHeight, sizedCells)
 
 	result := make([]string, maxHeight)
 
@@ -109,6 +88,35 @@ func (row *Row) Render(width int, beam StyleBeam, context interface{}) ([]string
 	}
 
 	return result, nil
+}
+
+func (row *Row) padCellLinesToHeight(cellLines [][]rich.RichString, maxHeight int, sizedCells []*SizedCell) {
+	for i, lines := range cellLines {
+		spacerCount := maxHeight - len(lines)
+		if spacerCount == 0 {
+			continue
+		}
+
+		sc := sizedCells[i]
+		spacerWidth := sc.Width
+		if i > 0 {
+			spacerWidth++ // account for left pad
+		}
+
+		spacer := rich.MakeSpacer(spacerWidth, nil)
+
+		for j := 0; j < spacerCount; j++ {
+			cellLines[i] = append(cellLines[i], spacer)
+		}
+	}
+}
+
+func (row *Row) getMaxHeight(cellLines [][]rich.RichString) int {
+	maxHeight := 0
+	for _, lines := range cellLines {
+		maxHeight = intgr.Max(maxHeight, len(lines))
+	}
+	return maxHeight
 }
 
 func layoutAndStyleCell(
