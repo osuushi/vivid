@@ -180,15 +180,20 @@ func alignRow(row rich.RichString, alignment Alignment, width int) rich.RichStri
 	case Right:
 		return append(rich.MakeSpacer(width-len(row), nil), row...)
 	case Center:
-		freeSpace := width - len(row)
-		leftSide := freeSpace / 2
-		row = append(rich.MakeSpacer(leftSide, nil), row...)
-		rightSide := freeSpace - leftSide
-		return append(row, rich.MakeSpacer(rightSide, nil)...)
+		return centerRow(row, width)
 	case Justify:
 		return justifyLine(row, width)
 	}
 	panic(fmt.Sprintf("Unknown alignment: %v", alignment))
+}
+
+func centerRow(row rich.RichString, width int) rich.RichString {
+	freeSpace := width - len(row)
+	leftSide := freeSpace / 2
+	row = append(rich.MakeSpacer(leftSide, nil), row...)
+	rightSide := freeSpace - leftSide
+	row = append(row, rich.MakeSpacer(rightSide, nil)...)
+	return row
 }
 
 // Justify a line of text. This assumes that it is not the last line in a
