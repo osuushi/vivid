@@ -90,18 +90,11 @@ func hoistStyle(node *vivian.ContentNode) ([]vivian.Node, error) {
 		return []vivian.Node{node}, nil
 	}
 
-	anyCellCreators := false
-	for _, child := range node.Children {
-		if isCellCreatorNode(child) {
-			anyCellCreators = true
-			break
-		}
-	}
 	// If the noded doesn't contain a cell creator, hoisting is a no-op. Note that
 	// it is guaranteed that any cell creator descendents at this point will be a
 	// consecutive lineage. So not finding a cell creator in the children means
 	// that this entire subtree is styling.
-	if !anyCellCreators {
+	if !hasCellCreator(node) {
 		return []vivian.Node{node}, nil
 	}
 
@@ -139,6 +132,17 @@ func hoistStyle(node *vivian.ContentNode) ([]vivian.Node, error) {
 	appendCoalescedRun()
 
 	return replacement, nil
+}
+
+func hasCellCreator(node *vivian.ContentNode) bool {
+	anyCellCreators := false
+	for _, child := range node.Children {
+		if isCellCreatorNode(child) {
+			anyCellCreators = true
+			break
+		}
+	}
+	return anyCellCreators
 }
 
 func injectStyle(styleNode, cellCreator *vivian.ContentNode) {
