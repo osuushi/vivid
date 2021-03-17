@@ -10,7 +10,8 @@ bin/vivid: $(GENERATED_FILES) $(SRC_FILES)
 build: bin/vivid
 
 vivian/grammar_pigeon.go: vivian/grammar.peg
-	go get -u github.com/mna/pigeon golang.org/x/tools/cmd/goimports
+	go install github.com/mna/pigeon@v1.1.0
+	go install golang.org/x/tools/cmd/goimports@v0.1.0
 	pigeon vivian/grammar.peg | goimports > vivian/grammar_pigeon.go
 
 .last_test: $(GENERATED_FILES) $(SRC_FILES) $(TEST_FILES)
